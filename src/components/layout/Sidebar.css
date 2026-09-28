@@ -1,18 +1,38 @@
+/* Left-side panel. Closed: slid off-screen to the left. Open: slides in.
+   visibility keeps the hidden links out of the keyboard tab order. */
 .sidebar {
-  position: sticky;
+  position: fixed;
   top: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 1; /* below the ⋮ button, which sits in the panel's top-left corner */
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
-  height: 100svh;
-  padding: var(--space-5) var(--space-4);
+  width: min(18rem, 85vw);
+  padding: 0 var(--space-4) var(--space-5);
   overflow-y: auto;
   background: var(--color-primary);
   color: var(--color-on-primary);
+  box-shadow: 8px 0 24px rgba(22, 34, 46, 0.3);
+  transform: translateX(-100%);
+  visibility: hidden;
+  transition: transform 0.25s ease, visibility 0s linear 0.25s;
 }
 
+.sidebar--open {
+  transform: none;
+  visibility: visible;
+  transition-delay: 0s;
+}
+
+/* Same height as the top bar, and the brand lines up with the one in the bar
+   (space for the ⋮ button on the left). */
 .sidebar__brand {
-  padding: 0 var(--space-2);
+  display: flex;
+  align-items: center;
+  min-height: 4rem;
+  padding-left: calc(44px + var(--space-3));
 }
 
 .sidebar__nav {
@@ -75,23 +95,23 @@
   color: #cfe3e9;
 }
 
-/* Small screens: the sidebar becomes a drawer that slides in from the left. */
 @media (max-width: 899px) {
-  .sidebar {
-    position: fixed;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 40;
-    width: min(18rem, 85vw);
-    transform: translateX(-100%);
-    visibility: hidden; /* keeps hidden links out of the keyboard tab order */
-    transition: transform 0.2s ease, visibility 0s linear 0.2s;
+  .sidebar__brand {
+    min-height: 3.75rem;
   }
 
-  .sidebar--open {
-    transform: none;
-    visibility: visible;
-    transition-delay: 0s;
+  .sidebar__brand .brand__name {
+    font-size: var(--text-base);
+  }
+
+  .sidebar__brand .brand__logo {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sidebar {
+    transition: none;
   }
 }

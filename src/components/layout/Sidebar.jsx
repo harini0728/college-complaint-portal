@@ -4,8 +4,8 @@ import Button from '../ui/Button'
 import { ROLE_LABELS } from '../../constants/roles'
 import './Sidebar.css'
 
-// Left navigation. `items` is a list of { label, to }.
-// `open` only matters on small screens, where the sidebar slides in over the page.
+// Left-side navigation panel. It slides in from the left when the ⋮ button in
+// the top bar is clicked. `items` is a list of { label, to }.
 export default function Sidebar({ id, items, user, open, onNavigate, onLogout }) {
   return (
     <aside id={id} className={`sidebar${open ? ' sidebar--open' : ''}`}>

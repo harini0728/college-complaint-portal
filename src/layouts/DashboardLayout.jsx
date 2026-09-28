@@ -6,30 +6,34 @@ import { useAuth } from '../context/useAuth'
 import { NAV_BY_ROLE } from '../constants/navigation'
 import './DashboardLayout.css'
 
-const SIDEBAR_ID = 'app-sidebar'
+const MENU_ID = 'app-menu'
 
-// Shell for every signed-in page: sidebar + content area.
+// Shell for every signed-in page: top bar with a three-dot (⋮) button that opens a left-side menu + content area.
 // Student and admin pages both use this; the menu items depend on the role.
 export default function DashboardLayout() {
   const { user, logout } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
   const mainRef = useRef(null)
+  const menuButtonRef = useRef(null)
   const { pathname } = useLocation()
 
   const closeMenu = () => setMenuOpen(false)
 
-  // Pressing Escape closes the mobile menu.
+  // Pressing Escape closes the menu and returns focus to the ⋮ button.
   useEffect(() => {
     if (!menuOpen) return undefined
     const handleKeyDown = (event) => {
-      if (event.key === 'Escape') setMenuOpen(false)
+      if (event.key === 'Escape') {
+        setMenuOpen(false)
+        menuButtonRef.current?.focus()
+      }
     }
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [menuOpen])
 
   // New page: start at the top and move keyboard / screen reader focus to the
-  // content, so people do not have to tab through the sidebar again.
+  // content, so people do not have to tab through the menu again.
   // Only the path matters, so changing a filter (?q=...) does not trigger this.
   useEffect(() => {
     window.scrollTo(0, 0)
@@ -42,33 +46,41 @@ export default function DashboardLayout() {
         Skip to main content
       </a>
 
-      {/* Top bar: only visible on small screens */}
+      {/* Top bar: ⋮ button on the left (always visible), brand next to it */}
       <header className="shell__topbar">
         <button
           type="button"
-          className="shell__menu-button"
+          ref={menuButtonRef}
+          className={`shell__menu-button${menuOpen ? ' shell__menu-button--open' : ''}`}
+          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
           aria-expanded={menuOpen}
-          aria-controls={SIDEBAR_ID}
+          aria-controls={MENU_ID}
           onClick={() => setMenuOpen((isOpen) => !isOpen)}
         >
-          <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true">
-            <path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+          <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false">
+            <circle cx="10" cy="4" r="1.75" fill="currentColor" />
+            <circle cx="10" cy="10" r="1.75" fill="currentColor" />
+            <circle cx="10" cy="16" r="1.75" fill="currentColor" />
           </svg>
-          Menu
         </button>
-        <BrandMark />
+
+        <BrandMark inverse />
+
+        <Sidebar
+          id={MENU_ID}
+          items={NAV_BY_ROLE[user.role]}
+          user={user}
+          open={menuOpen}
+          onNavigate={closeMenu}
+          onLogout={logout}
+        />
       </header>
 
-      <Sidebar
-        id={SIDEBAR_ID}
-        items={NAV_BY_ROLE[user.role]}
-        user={user}
-        open={menuOpen}
-        onNavigate={closeMenu}
-        onLogout={logout}
+      <div
+        className={`shell__backdrop${menuOpen ? ' shell__backdrop--visible' : ''}`}
+        onClick={closeMenu}
+        aria-hidden="true"
       />
-
-      {menuOpen && <div className="shell__backdrop" onClick={closeMenu} aria-hidden="true" />}
 
       <main className="shell__main" id="main-content" ref={mainRef} tabIndex={-1}>
         <div className="shell__content">
