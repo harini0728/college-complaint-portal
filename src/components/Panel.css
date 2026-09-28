@@ -24,3 +24,14 @@
     padding: var(--space-4);
   }
 }
+
+/* Padded content area inside a Panel (lists use no padding; forms and text do). */
+.panel-body {
+  padding: var(--space-5);
+}
+
+@media (max-width: 599px) {
+  .panel-body {
+    padding: var(--space-4);
+  }
+}

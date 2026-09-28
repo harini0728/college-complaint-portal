@@ -1,0 +1,137 @@
+.details {
+  display: grid;
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.details__main,
+.details__aside {
+  display: grid;
+  gap: var(--space-5);
+  min-width: 0;
+}
+
+/* Wide screens: timeline sits beside the details. */
+@media (min-width: 1280px) {
+  .details {
+    grid-template-columns: minmax(0, 1fr) 20rem;
+  }
+
+  .details__aside {
+    position: sticky;
+    top: var(--space-5);
+  }
+}
+
+.details__body {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.details__status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2) var(--space-3);
+}
+
+.details__status-text,
+.details__muted {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+}
+
+.detail-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4) var(--space-5);
+  margin: 0;
+}
+
+.detail-list__item {
+  min-width: 0;
+}
+
+.detail-list dt {
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-muted);
+}
+
+.detail-list dd {
+  margin: var(--space-1) 0 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.details__subheading {
+  margin-bottom: var(--space-2);
+  font-size: var(--text-base);
+}
+
+.details__description,
+.details__response {
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.details__response-note {
+  margin-top: var(--space-3);
+}
+
+.attachment {
+  display: grid;
+  gap: var(--space-3);
+  justify-items: start;
+}
+
+.attachment__preview {
+  display: block;
+  max-width: min(20rem, 100%);
+  max-height: 14rem;
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+}
+
+.details__success {
+  margin-bottom: var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  color: var(--status-resolved-fg);
+  background: var(--status-resolved-bg);
+  border: 1px solid var(--status-resolved-dot);
+  border-radius: var(--radius-sm);
+}
+
+.details__success a {
+  color: inherit;
+}
+
+/* Loading placeholders */
+.details__loading {
+  display: grid;
+  gap: var(--space-3);
+  padding: var(--space-5);
+  background: var(--color-paper);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+}
+
+.details__skeleton-title {
+  width: min(24rem, 70%);
+  height: 1.5rem;
+}
+
+.details__skeleton-line {
+  width: 100%;
+  height: 1rem;
+}
+
+.details__skeleton-line--short {
+  width: 45%;
+}
+
+@media (max-width: 599px) {
+  .detail-list {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

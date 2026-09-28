@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { getComplaintsForStudent } from '../data/complaints'
+import { useEffect, useMemo, useState } from 'react'
+import { useComplaints } from '../context/useComplaints'
 
 const FAKE_NETWORK_DELAY_MS = 500
 
@@ -7,14 +7,18 @@ const FAKE_NETWORK_DELAY_MS = 500
 // The short delay imitates a real request so the loading state is visible.
 // When the backend exists, only the inside of this hook changes.
 export function useStudentComplaints(studentId) {
-  const [state, setState] = useState({ complaints: [], loading: true })
+  const { complaints: allComplaints } = useComplaints()
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setState({ complaints: getComplaintsForStudent(studentId), loading: false })
-    }, FAKE_NETWORK_DELAY_MS)
+    const timer = setTimeout(() => setLoading(false), FAKE_NETWORK_DELAY_MS)
     return () => clearTimeout(timer)
   }, [studentId])
 
-  return state
+  const complaints = useMemo(
+    () => allComplaints.filter((complaint) => complaint.submittedBy.id === studentId),
+    [allComplaints, studentId],
+  )
+
+  return { complaints, loading }
 }
