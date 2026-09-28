@@ -1,0 +1,23 @@
+.page-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+}
+
+.page-header__title {
+  font-size: var(--text-2xl);
+}
+
+.page-header__description {
+  margin-top: var(--space-1);
+  color: var(--color-muted);
+}
+
+@media (max-width: 599px) {
+  .page-header__title {
+    font-size: var(--text-xl);
+  }
+}

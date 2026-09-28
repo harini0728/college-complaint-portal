@@ -1,0 +1,57 @@
+.login {
+  display: grid;
+  gap: var(--space-5);
+  width: 100%;
+  max-width: 26rem;
+  padding: var(--space-6);
+  background: var(--color-paper);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+}
+
+.login__title {
+  font-size: var(--text-xl);
+}
+
+.login__subtitle {
+  margin-top: var(--space-1);
+  color: var(--color-muted);
+}
+
+.login__form {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.login__alert {
+  padding: var(--space-3) var(--space-4);
+  font-size: var(--text-sm);
+  color: var(--color-danger);
+  background: var(--color-danger-soft);
+  border: 1px solid var(--color-danger);
+  border-radius: var(--radius-sm);
+}
+
+/* Show / Hide button inside the password field */
+.login__toggle {
+  min-height: 36px;
+  padding: 0 var(--space-3);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-primary);
+  background: none;
+  border: 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.login__toggle:hover {
+  background: var(--color-primary-soft);
+}
+
+@media (max-width: 480px) {
+  .login {
+    padding: var(--space-5);
+  }
+}

@@ -1,0 +1,74 @@
+.brand-panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-7);
+  padding: var(--space-7) clamp(2rem, 5vw, 4.5rem);
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.brand-panel__body {
+  display: grid;
+  gap: var(--space-5);
+  max-width: 30rem;
+}
+
+.brand-panel__headline {
+  font-family: var(--font-heading);
+  font-size: var(--text-2xl);
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+.brand-panel__intro {
+  color: #cfe3e9;
+}
+
+/* Vertical timeline: a line runs down the left with a dot at each step. */
+.lifecycle {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-left: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.lifecycle__step {
+  position: relative;
+  display: grid;
+  gap: var(--space-2);
+  justify-items: start;
+  padding: 0 0 var(--space-5) var(--space-5);
+  font-size: var(--text-sm);
+  color: #e4f0f3;
+}
+
+.lifecycle__step:last-child {
+  padding-bottom: 0;
+}
+
+.lifecycle__step::before {
+  content: '';
+  position: absolute;
+  top: 0.55rem;
+  left: -7px;
+  width: 12px;
+  height: 12px;
+  background: var(--color-primary);
+  border: 2px solid #ffffff;
+  border-radius: 50%;
+}
+
+.brand-panel__note {
+  font-size: var(--text-sm);
+  color: #cfe3e9;
+}
+
+/* On phones the panel shrinks to just the logo bar so the form stays above the fold. */
+@media (max-width: 899px) {
+  .brand-panel {
+    padding: var(--space-4) var(--space-5);
+  }
+  .brand-panel__body {
+    display: none;
+  }
+}

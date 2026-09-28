@@ -1,0 +1,97 @@
+.sidebar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5);
+  height: 100svh;
+  padding: var(--space-5) var(--space-4);
+  overflow-y: auto;
+  background: var(--color-primary);
+  color: var(--color-on-primary);
+}
+
+.sidebar__brand {
+  padding: 0 var(--space-2);
+}
+
+.sidebar__nav {
+  flex: 1;
+}
+
+.sidebar__list {
+  display: grid;
+  gap: var(--space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sidebar__link {
+  display: block;
+  padding: 0.65rem var(--space-4);
+  font-size: 0.9375rem;
+  color: #d3e6ec;
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+}
+
+.sidebar__link:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+}
+
+.sidebar__link.active {
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  font-weight: 600;
+  box-shadow: inset 3px 0 0 #ffffff;
+}
+
+/* The default focus ring is teal on teal here, so use white. */
+.sidebar :focus-visible {
+  outline-color: #ffffff;
+}
+
+.sidebar__footer {
+  display: grid;
+  gap: var(--space-4);
+  padding-top: var(--space-4);
+  border-top: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.sidebar__user {
+  display: grid;
+  padding: 0 var(--space-2);
+  overflow-wrap: anywhere;
+}
+
+.sidebar__user-name {
+  font-weight: 600;
+}
+
+.sidebar__user-meta {
+  font-size: var(--text-xs);
+  color: #cfe3e9;
+}
+
+/* Small screens: the sidebar becomes a drawer that slides in from the left. */
+@media (max-width: 899px) {
+  .sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 40;
+    width: min(18rem, 85vw);
+    transform: translateX(-100%);
+    visibility: hidden; /* keeps hidden links out of the keyboard tab order */
+    transition: transform 0.2s ease, visibility 0s linear 0.2s;
+  }
+
+  .sidebar--open {
+    transform: none;
+    visibility: visible;
+    transition-delay: 0s;
+  }
+}

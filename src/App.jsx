@@ -1,122 +1,69 @@
-import { useState } from 'react'
-import heroImg from './assets/hero.png'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import './App.css'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import AuthProvider from './context/AuthProvider'
+import { useAuth } from './context/useAuth'
+import ProtectedRoute from './routes/ProtectedRoute'
+import DashboardLayout from './layouts/DashboardLayout'
+import LoginPage from './pages/LoginPage'
+import StudentDashboardPage from './pages/StudentDashboardPage'
+import ComingSoonPage from './pages/ComingSoonPage'
+import NotFoundPage from './pages/NotFoundPage'
+import { ROLES } from './constants/roles'
+import { ROUTES, getHomePath } from './constants/routes'
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
-
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
-        </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
-
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+// "/" sends signed-in users to their dashboard and everyone else to login.
+function HomeRedirect() {
+  const { user } = useAuth()
+  return <Navigate to={user ? getHomePath(user.role) : ROUTES.LOGIN} replace />
 }
 
-export default App
+// Shorthand for a page that is not built yet.
+const soon = (title) => <ComingSoonPage title={title} />
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <Routes>
+          <Route path={ROUTES.HOME} element={<HomeRedirect />} />
+          <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+
+          {/* Student pages: all share the sidebar layout */}
+          <Route
+            element={
+              <ProtectedRoute allowedRole={ROLES.STUDENT}>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path={ROUTES.STUDENT_DASHBOARD} element={<StudentDashboardPage />} />
+            <Route path={ROUTES.STUDENT_SUBMIT} element={soon('Submit Complaint')} />
+            <Route path={ROUTES.STUDENT_COMPLAINTS} element={soon('My Complaints')} />
+            <Route
+              path={`${ROUTES.STUDENT_COMPLAINTS}/:id`}
+              element={soon('Complaint Details')}
+            />
+            <Route path={ROUTES.STUDENT_PROFILE} element={soon('Profile')} />
+          </Route>
+
+          {/* Admin pages: same layout, admin menu */}
+          <Route
+            element={
+              <ProtectedRoute allowedRole={ROLES.ADMIN}>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path={ROUTES.ADMIN_DASHBOARD} element={soon('Admin Dashboard')} />
+            <Route path={ROUTES.ADMIN_COMPLAINTS} element={soon('All Complaints')} />
+            <Route path={ROUTES.ADMIN_PENDING} element={soon('Pending Complaints')} />
+            <Route path={ROUTES.ADMIN_IN_PROGRESS} element={soon('In Progress Complaints')} />
+            <Route path={ROUTES.ADMIN_RESOLVED} element={soon('Resolved Complaints')} />
+            <Route path={ROUTES.ADMIN_PROFILE} element={soon('Profile')} />
+          </Route>
+
+          <Route path="*" element={<NotFoundPage />} />
+        </Routes>
+      </AuthProvider>
+    </BrowserRouter>
+  )
+}

@@ -1,0 +1,57 @@
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10.5rem, 1fr));
+  gap: var(--space-4);
+  margin: 0 0 var(--space-6);
+}
+
+.stat-card {
+  display: grid;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-4) var(--space-5);
+  background: var(--color-paper);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+}
+
+.stat-card__label {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--color-muted);
+}
+
+.stat-card__dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+}
+.stat-card__dot--pending {
+  background: var(--status-pending-dot);
+}
+.stat-card__dot--in-progress {
+  background: var(--status-in-progress-dot);
+}
+.stat-card__dot--resolved {
+  background: var(--status-resolved-dot);
+}
+.stat-card__dot--rejected {
+  background: var(--status-rejected-dot);
+}
+
+.stat-card__value {
+  margin: 0;
+  font-family: var(--font-heading);
+  font-size: 2.25rem;
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--color-ink);
+}
+
+.stat-card__skeleton {
+  width: 2.5rem;
+  height: 2.25rem;
+}

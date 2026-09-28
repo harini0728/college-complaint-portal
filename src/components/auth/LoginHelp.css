@@ -1,0 +1,22 @@
+.login-help__toggle {
+  padding: var(--space-1) 0;
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-primary);
+  background: none;
+  border: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.login-help__panel {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  padding: var(--space-4);
+  font-size: var(--text-sm);
+  background: var(--color-primary-soft);
+  border-radius: var(--radius-sm);
+}

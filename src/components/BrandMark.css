@@ -1,0 +1,29 @@
+.brand {
+  --brand-check: var(--color-paper);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  color: var(--color-primary);
+}
+
+.brand__logo {
+  width: 2rem;
+  height: 2rem;
+  flex: none;
+}
+
+.brand__name {
+  font-family: var(--font-heading);
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-ink);
+}
+
+/* On the teal panel: white logo with a teal tick, white name. */
+.brand--inverse {
+  --brand-check: var(--color-primary);
+  color: var(--color-paper);
+}
+.brand--inverse .brand__name {
+  color: var(--color-paper);
+}

@@ -1,0 +1,76 @@
+.shell {
+  display: grid;
+  grid-template-columns: 16.5rem minmax(0, 1fr);
+  min-height: 100svh;
+}
+
+.shell__main {
+  padding: var(--space-6) clamp(1.5rem, 4vw, 3rem) var(--space-7);
+}
+
+.shell__content {
+  max-width: 68rem;
+  margin: 0 auto;
+}
+
+/* Hidden on desktop */
+.shell__topbar,
+.shell__backdrop {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  .shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .shell__topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-4);
+    background: var(--color-paper);
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .shell__topbar .brand__name {
+    font-size: var(--text-base);
+  }
+
+  .shell__topbar .brand__logo {
+    width: 1.75rem;
+    height: 1.75rem;
+  }
+
+  .shell__menu-button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-height: 44px;
+    padding: 0 var(--space-3);
+    font: inherit;
+    font-size: var(--text-sm);
+    font-weight: 600;
+    color: var(--color-ink);
+    background: none;
+    border: 1px solid var(--color-line-strong);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+  }
+
+  .shell__backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 30;
+    display: block;
+    background: rgba(22, 34, 46, 0.5);
+  }
+
+  .shell__main {
+    padding: var(--space-5) var(--space-4) var(--space-6);
+  }
+}
