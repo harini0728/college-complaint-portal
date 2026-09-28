@@ -6,6 +6,9 @@ export const COMPLAINT_STATUSES = {
   REJECTED: 'Rejected',
 }
 
+// The four statuses as a list, for dropdowns and validation.
+export const STATUS_LIST = Object.values(COMPLAINT_STATUSES)
+
 // What each status means, in words a student understands.
 export const STATUS_DESCRIPTIONS = {
   [COMPLAINT_STATUSES.PENDING]:

@@ -1,9 +1,36 @@
 import { Link } from 'react-router-dom'
 import BrandMark from '../components/BrandMark'
-import { ROUTES } from '../constants/routes'
+import PageHeader from '../components/PageHeader'
+import Panel from '../components/Panel'
+import EmptyState from '../components/EmptyState'
+import Button from '../components/ui/Button'
+import { useAuth } from '../context/useAuth'
+import { usePageTitle } from '../hooks/usePageTitle'
+import { ROUTES, getHomePath } from '../constants/routes'
 import './PlaceholderPages.css'
 
-export default function NotFoundPage() {
+// Two versions:
+//   inLayout: a wrong URL under /student/... or /admin/... keeps the sidebar
+//   default:  any other wrong URL gets a plain full-page message
+export default function NotFoundPage({ inLayout = false }) {
+  const { user } = useAuth()
+  usePageTitle('Page not found')
+
+  if (inLayout) {
+    return (
+      <>
+        <PageHeader title="Page not found" />
+        <Panel title="Page not found">
+          <EmptyState
+            title="This page does not exist"
+            message="The link may be mistyped or out of date. Use the menu, or go back to your dashboard."
+            action={<Button to={getHomePath(user.role)}>Go to dashboard</Button>}
+          />
+        </Panel>
+      </>
+    )
+  }
+
   return (
     <div className="placeholder">
       <div className="placeholder__card">

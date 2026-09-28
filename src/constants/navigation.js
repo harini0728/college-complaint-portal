@@ -16,6 +16,7 @@ export const NAV_BY_ROLE = {
     { label: 'Pending', to: ROUTES.ADMIN_PENDING },
     { label: 'In Progress', to: ROUTES.ADMIN_IN_PROGRESS },
     { label: 'Resolved', to: ROUTES.ADMIN_RESOLVED },
+    { label: 'Rejected', to: ROUTES.ADMIN_REJECTED },
     { label: 'Profile', to: ROUTES.ADMIN_PROFILE },
   ],
 }

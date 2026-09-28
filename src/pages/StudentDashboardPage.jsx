@@ -25,6 +25,7 @@ export default function StudentDashboardPage() {
     <>
       <PageHeader
         title={`Welcome back, ${firstName}`}
+        tabTitle="Dashboard"
         description="Here is where your complaints stand today."
         action={<Button to={ROUTES.STUDENT_SUBMIT}>Submit a complaint</Button>}
       />

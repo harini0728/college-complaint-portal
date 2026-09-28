@@ -8,12 +8,11 @@ import SelectField from '../components/ui/SelectField'
 import ComplaintList, { ComplaintListSkeleton } from '../components/ComplaintList'
 import { useAuth } from '../context/useAuth'
 import { useStudentComplaints } from '../hooks/useStudentComplaints'
-import { COMPLAINT_STATUSES } from '../constants/statuses'
+import { STATUS_LIST } from '../constants/statuses'
 import { ROUTES, studentComplaintPath } from '../constants/routes'
 import { filterComplaints, sortNewestFirst } from '../utils/complaints'
 import './MyComplaintsPage.css'
 
-const STATUS_OPTIONS = Object.values(COMPLAINT_STATUSES)
 
 export default function MyComplaintsPage() {
   const { user } = useAuth()
@@ -63,7 +62,7 @@ export default function MyComplaintsPage() {
               <SelectField
                 label="Status"
                 name="status"
-                options={STATUS_OPTIONS}
+                options={STATUS_LIST}
                 placeholder="All statuses"
                 value={status}
                 onChange={(event) => setStatus(event.target.value)}

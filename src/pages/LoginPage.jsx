@@ -9,11 +9,13 @@ import DemoCredentials from '../components/auth/DemoCredentials'
 import { useAuth } from '../context/useAuth'
 import { ROLES } from '../constants/roles'
 import { getHomePath } from '../constants/routes'
+import { usePageTitle } from '../hooks/usePageTitle'
 import { validateLogin } from '../utils/validation'
 import './LoginPage.css'
 
 export default function LoginPage() {
   const { user, login } = useAuth()
+  usePageTitle('Sign in')
 
   const [role, setRole] = useState(ROLES.STUDENT)
   const [identifier, setIdentifier] = useState('')

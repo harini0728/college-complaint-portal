@@ -1,0 +1,88 @@
+import { Link } from 'react-router-dom'
+import PageHeader from '../components/PageHeader'
+import Panel from '../components/Panel'
+import StatCard from '../components/StatCard'
+import EmptyState from '../components/EmptyState'
+import Button from '../components/ui/Button'
+import ComplaintList, { ComplaintListSkeleton } from '../components/ComplaintList'
+import { StatusBreakdown, CategoryBreakdown } from '../components/admin/AdminCharts'
+import { useAuth } from '../context/useAuth'
+import { useAllComplaints } from '../hooks/useAllComplaints'
+import { COMPLAINT_STATUSES as STATUS } from '../constants/statuses'
+import { ROUTES, adminComplaintPath } from '../constants/routes'
+import { countByCategory, countByStatus, sortComplaints } from '../utils/complaints'
+import './AdminDashboardPage.css'
+
+const RECENT_COUNT = 5
+
+export default function AdminDashboardPage() {
+  const { user } = useAuth()
+  const { complaints, loading } = useAllComplaints()
+
+  const counts = countByStatus(complaints)
+  const recent = sortComplaints(complaints, 'newest').slice(0, RECENT_COUNT)
+
+  return (
+    <>
+      <PageHeader
+        title={`Welcome, ${user.name}`}
+        tabTitle="Admin dashboard"
+        description={`${user.department}. Here is where all complaints stand today.`}
+        action={<Button to={ROUTES.ADMIN_COMPLAINTS}>View all complaints</Button>}
+      />
+
+      <dl className="stats admin-stats" aria-busy={loading}>
+        <StatCard label="Total complaints" value={counts.total} loading={loading} />
+        <StatCard label={STATUS.PENDING} status={STATUS.PENDING} value={counts.pending} loading={loading} />
+        <StatCard label={STATUS.IN_PROGRESS} status={STATUS.IN_PROGRESS} value={counts.inProgress} loading={loading} />
+        <StatCard label={STATUS.RESOLVED} status={STATUS.RESOLVED} value={counts.resolved} loading={loading} />
+        <StatCard label={STATUS.REJECTED} status={STATUS.REJECTED} value={counts.rejected} loading={loading} />
+      </dl>
+
+      <div className="admin-dashboard">
+        <Panel
+          title="Recent complaints"
+          action={
+            !loading && recent.length > 0 && (
+              <Link to={ROUTES.ADMIN_COMPLAINTS}>View all complaints</Link>
+            )
+          }
+        >
+          {loading && <ComplaintListSkeleton />}
+
+          {!loading && recent.length === 0 && (
+            <EmptyState
+              title="No complaints yet"
+              message="Complaints submitted by students will appear here."
+            />
+          )}
+
+          {!loading && recent.length > 0 && (
+            <ComplaintList
+              complaints={recent}
+              showStudent
+              getLink={(complaint) => adminComplaintPath(complaint.id)}
+            />
+          )}
+        </Panel>
+
+        <div className="admin-dashboard__side">
+          <Panel title="By status">
+            <div className="panel-body">
+              {loading ? <span className="skeleton admin-dashboard__skeleton" /> : <StatusBreakdown counts={counts} />}
+            </div>
+          </Panel>
+          <Panel title="By category">
+            <div className="panel-body">
+              {loading ? (
+                <span className="skeleton admin-dashboard__skeleton" />
+              ) : (
+                <CategoryBreakdown categories={countByCategory(complaints)} />
+              )}
+            </div>
+          </Panel>
+        </div>
+      </div>
+    </>
+  )
+}

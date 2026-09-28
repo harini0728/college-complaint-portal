@@ -1,0 +1,20 @@
+.profile {
+  display: grid;
+  gap: var(--space-5);
+  max-width: 46rem;
+}
+
+.profile .panel-body {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.profile__note {
+  font-size: var(--text-sm);
+  color: var(--color-muted);
+}
+
+/* The cards sit inside a panel already, so no extra space below them. */
+.profile__stats {
+  margin: 0;
+}

@@ -8,6 +8,10 @@
   padding: var(--space-6) clamp(1.5rem, 4vw, 3rem) var(--space-7);
 }
 
+.shell__main:focus {
+  outline: none; /* focus is moved here by code, not by the person tabbing */
+}
+
 .shell__content {
   max-width: 68rem;
   margin: 0 auto;

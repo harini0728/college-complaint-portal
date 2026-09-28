@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react'
-import { Outlet } from 'react-router-dom'
+import { useEffect, useRef, useState } from 'react'
+import { Outlet, useLocation } from 'react-router-dom'
 import Sidebar from '../components/layout/Sidebar'
 import BrandMark from '../components/BrandMark'
 import { useAuth } from '../context/useAuth'
@@ -13,6 +13,8 @@ const SIDEBAR_ID = 'app-sidebar'
 export default function DashboardLayout() {
   const { user, logout } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
+  const mainRef = useRef(null)
+  const { pathname } = useLocation()
 
   const closeMenu = () => setMenuOpen(false)
 
@@ -25,6 +27,14 @@ export default function DashboardLayout() {
     document.addEventListener('keydown', handleKeyDown)
     return () => document.removeEventListener('keydown', handleKeyDown)
   }, [menuOpen])
+
+  // New page: start at the top and move keyboard / screen reader focus to the
+  // content, so people do not have to tab through the sidebar again.
+  // Only the path matters, so changing a filter (?q=...) does not trigger this.
+  useEffect(() => {
+    window.scrollTo(0, 0)
+    mainRef.current?.focus({ preventScroll: true })
+  }, [pathname])
 
   return (
     <div className="shell">
@@ -60,7 +70,7 @@ export default function DashboardLayout() {
 
       {menuOpen && <div className="shell__backdrop" onClick={closeMenu} aria-hidden="true" />}
 
-      <main className="shell__main" id="main-content">
+      <main className="shell__main" id="main-content" ref={mainRef} tabIndex={-1}>
         <div className="shell__content">
           <Outlet />
         </div>

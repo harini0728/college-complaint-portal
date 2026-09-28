@@ -4,8 +4,9 @@ import { formatDate } from '../utils/complaints'
 import './ComplaintList.css'
 
 // A list of complaints, one row each. Each row is a link to that complaint.
-//   getLink: function that turns a complaint into a URL
-export default function ComplaintList({ complaints, getLink }) {
+//   getLink:     function that turns a complaint into a URL
+//   showStudent: also show who submitted each complaint (admin pages)
+export default function ComplaintList({ complaints, getLink, showStudent = false }) {
   return (
     <ul className="complaint-list">
       {complaints.map((complaint) => (
@@ -15,6 +16,11 @@ export default function ComplaintList({ complaints, getLink }) {
               <span className="complaint-item__title">{complaint.title}</span>
               <span className="complaint-item__meta">
                 <span className="complaint-item__id">{complaint.id}</span>
+                {showStudent && (
+                  <span>
+                    {complaint.submittedBy.name} ({complaint.submittedBy.id})
+                  </span>
+                )}
                 <span>{complaint.category}</span>
                 <span>{formatDate(complaint.submittedOn)}</span>
               </span>

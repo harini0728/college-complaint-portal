@@ -81,46 +81,128 @@ export function filterComplaints(complaints, { query = '', status = '' }) {
   })
 }
 
-// The steps shown in the status timeline on the details page.
-// Each step is 'done', 'current' or 'upcoming'. We only know the submission
-// date for now; the backend can add a date for every step later.
-export function getTimeline(complaint) {
-  const submitted = {
-    key: 'submitted',
-    label: 'Submitted',
-    description: 'Your complaint was received.',
-    date: complaint.submittedOn,
-  }
+// ---------- Admin helpers ----------
 
-  switch (complaint.status) {
-    case STATUS.PENDING:
-      return [
-        { ...submitted, state: 'done' },
-        { key: 'review', label: STATUS.PENDING, description: 'Waiting for review by the administration.', state: 'current' },
-        { key: 'progress', label: STATUS.IN_PROGRESS, description: 'The concerned department starts work.', state: 'upcoming' },
-        { key: 'resolved', label: STATUS.RESOLVED, description: 'The issue is fixed.', state: 'upcoming' },
-      ]
-    case STATUS.IN_PROGRESS:
-      return [
-        { ...submitted, state: 'done' },
-        { key: 'review', label: 'Reviewed', description: 'The administration reviewed your complaint.', state: 'done' },
-        { key: 'progress', label: STATUS.IN_PROGRESS, description: 'The concerned department is working on the issue.', state: 'current' },
-        { key: 'resolved', label: STATUS.RESOLVED, description: 'The issue is fixed.', state: 'upcoming' },
-      ]
-    case STATUS.RESOLVED:
-      return [
-        { ...submitted, state: 'done' },
-        { key: 'review', label: 'Reviewed', description: 'The administration reviewed your complaint.', state: 'done' },
-        { key: 'progress', label: STATUS.IN_PROGRESS, description: 'The concerned department worked on the issue.', state: 'done' },
-        { key: 'resolved', label: STATUS.RESOLVED, description: 'The issue is fixed.', state: 'current' },
-      ]
-    case STATUS.REJECTED:
-      return [
-        { ...submitted, state: 'done' },
-        { key: 'review', label: 'Reviewed', description: 'The administration reviewed your complaint.', state: 'done' },
-        { key: 'rejected', label: STATUS.REJECTED, description: 'The complaint could not be acted on. See the response.', state: 'current', tone: 'rejected' },
-      ]
-    default:
-      return [{ ...submitted, state: 'current' }]
+// Oldest or newest first. Same-day complaints are ordered by their number.
+export function sortComplaints(complaints, order = 'newest') {
+  const numberOf = (complaint) => Number(complaint.id.replace('CMP-', '')) || 0
+  const direction = order === 'oldest' ? 1 : -1
+  return [...complaints].sort(
+    (a, b) =>
+      direction *
+      (a.submittedOn.localeCompare(b.submittedOn) || numberOf(a) - numberOf(b)),
+  )
+}
+
+// The admin search box: matches complaint ID, title, student name and student ID.
+// Every word typed must match somewhere ("fan priya" finds Priya's fan complaint).
+export function filterAdminComplaints(complaints, { query = '', category = '', status = '' }) {
+  const words = query.replace(/#/g, '').trim().toLowerCase().split(/\s+/).filter(Boolean)
+
+  return complaints.filter((complaint) => {
+    if (status && complaint.status !== status) return false
+    if (category && complaint.category !== category) return false
+    if (words.length === 0) return true
+
+    const haystack = [
+      complaint.id,
+      complaint.title,
+      complaint.submittedBy.name,
+      complaint.submittedBy.id,
+    ]
+      .join(' ')
+      .toLowerCase()
+    return words.every((word) => haystack.includes(word))
+  })
+}
+
+// [{ category, count }] for categories that have complaints, biggest first.
+export function countByCategory(complaints) {
+  const counts = new Map()
+  complaints.forEach((complaint) => {
+    counts.set(complaint.category, (counts.get(complaint.category) ?? 0) + 1)
+  })
+  return [...counts.entries()]
+    .map(([category, count]) => ({ category, count }))
+    .sort((a, b) => b.count - a.count || a.category.localeCompare(b.category))
+}
+
+export function percentOf(count, total) {
+  return total === 0 ? 0 : Math.round((count / total) * 100)
+}
+
+// ---------- Status history and timeline ----------
+
+// Every complaint keeps a history: [{ status, date }], oldest first. The first
+// entry is the submission. The admin adds one entry each time the status changes.
+// The dummy complaints have no history yet, so this builds a simple one from
+// their current status (the dates of the middle steps are unknown, so left out).
+export function buildHistory(complaint) {
+  const history = [{ status: STATUS.PENDING, date: complaint.submittedOn }]
+  if (complaint.status === STATUS.IN_PROGRESS) {
+    history.push({ status: STATUS.IN_PROGRESS })
   }
+  if (complaint.status === STATUS.RESOLVED) {
+    history.push({ status: STATUS.IN_PROGRESS }, { status: STATUS.RESOLVED })
+  }
+  if (complaint.status === STATUS.REJECTED) {
+    history.push({ status: STATUS.REJECTED })
+  }
+  return history
+}
+
+const STEP_TEXT = {
+  [STATUS.PENDING]: 'Waiting for review by the administration.',
+  [STATUS.IN_PROGRESS]: 'The concerned department is working on the issue.',
+  [STATUS.RESOLVED]: 'The issue is fixed.',
+  [STATUS.REJECTED]: 'The complaint could not be acted on. See the response.',
+}
+
+// The steps shown in the status timeline (student and admin pages).
+// Each step is 'done', 'current' or 'upcoming'. Steps come from the complaint's
+// history, followed by the stages that are still ahead.
+export function getTimeline(complaint) {
+  const history = complaint.history ?? buildHistory(complaint)
+
+  const steps = [
+    {
+      key: 'submitted',
+      label: 'Submitted',
+      description: 'The complaint was received.',
+      date: complaint.submittedOn,
+      state: 'done',
+    },
+  ]
+
+  history.slice(1).forEach((entry, index) => {
+    steps.push({
+      key: `change-${index}`,
+      label: entry.status,
+      description: STEP_TEXT[entry.status],
+      date: entry.date,
+      state: 'done',
+      tone: entry.status === STATUS.REJECTED ? 'rejected' : undefined,
+    })
+  })
+
+  const latest = history[history.length - 1].status
+
+  // A brand-new complaint has no change yet, so show "Pending" as the current step.
+  if (history.length === 1) {
+    steps.push({
+      key: 'pending',
+      label: STATUS.PENDING,
+      description: STEP_TEXT[STATUS.PENDING],
+      state: 'done',
+    })
+  }
+  steps[steps.length - 1].state = 'current'
+
+  if (latest === STATUS.PENDING) {
+    steps.push({ key: 'next-progress', label: STATUS.IN_PROGRESS, description: 'The concerned department starts work.', state: 'upcoming' })
+  }
+  if (latest === STATUS.PENDING || latest === STATUS.IN_PROGRESS) {
+    steps.push({ key: 'next-resolved', label: STATUS.RESOLVED, description: 'The issue is fixed.', state: 'upcoming' })
+  }
+  return steps
 }

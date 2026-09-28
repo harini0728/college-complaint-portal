@@ -1,0 +1,24 @@
+.admin-details {
+  display: grid;
+  gap: var(--space-5);
+  align-items: start;
+}
+
+.admin-details__main,
+.admin-details__aside {
+  display: grid;
+  gap: var(--space-5);
+  min-width: 0;
+}
+
+/* Wide screens: timeline sits beside the details. */
+@media (min-width: 1280px) {
+  .admin-details {
+    grid-template-columns: minmax(0, 1fr) 20rem;
+  }
+
+  .admin-details__aside {
+    position: sticky;
+    top: var(--space-5);
+  }
+}

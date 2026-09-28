@@ -6,12 +6,16 @@ import ProtectedRoute from './routes/ProtectedRoute'
 import DashboardLayout from './layouts/DashboardLayout'
 import LoginPage from './pages/LoginPage'
 import StudentDashboardPage from './pages/StudentDashboardPage'
+import ProfilePage from './pages/ProfilePage'
 import SubmitComplaintPage from './pages/SubmitComplaintPage'
 import MyComplaintsPage from './pages/MyComplaintsPage'
 import ComplaintDetailsPage from './pages/ComplaintDetailsPage'
-import ComingSoonPage from './pages/ComingSoonPage'
+import AdminDashboardPage from './pages/AdminDashboardPage'
+import AdminComplaintsPage from './pages/AdminComplaintsPage'
+import AdminComplaintDetailsPage from './pages/AdminComplaintDetailsPage'
 import NotFoundPage from './pages/NotFoundPage'
 import { ROLES } from './constants/roles'
+import { COMPLAINT_STATUSES as STATUS } from './constants/statuses'
 import { ROUTES, getHomePath } from './constants/routes'
 
 // "/" sends signed-in users to their dashboard and everyone else to login.
@@ -19,9 +23,6 @@ function HomeRedirect() {
   const { user } = useAuth()
   return <Navigate to={user ? getHomePath(user.role) : ROUTES.LOGIN} replace />
 }
-
-// Shorthand for a page that is not built yet.
-const soon = (title) => <ComingSoonPage title={title} />
 
 export default function App() {
   return (
@@ -47,7 +48,9 @@ export default function App() {
                 path={`${ROUTES.STUDENT_COMPLAINTS}/:id`}
                 element={<ComplaintDetailsPage />}
               />
-              <Route path={ROUTES.STUDENT_PROFILE} element={soon('Profile')} />
+              <Route path={ROUTES.STUDENT_PROFILE} element={<ProfilePage />} />
+              {/* Wrong URL under /student/: keep the sidebar */}
+              <Route path="/student/*" element={<NotFoundPage inLayout />} />
             </Route>
 
             {/* Admin pages: same layout, admin menu */}
@@ -58,12 +61,60 @@ export default function App() {
                 </ProtectedRoute>
               }
             >
-              <Route path={ROUTES.ADMIN_DASHBOARD} element={soon('Admin Dashboard')} />
-              <Route path={ROUTES.ADMIN_COMPLAINTS} element={soon('All Complaints')} />
-              <Route path={ROUTES.ADMIN_PENDING} element={soon('Pending Complaints')} />
-              <Route path={ROUTES.ADMIN_IN_PROGRESS} element={soon('In Progress Complaints')} />
-              <Route path={ROUTES.ADMIN_RESOLVED} element={soon('Resolved Complaints')} />
-              <Route path={ROUTES.ADMIN_PROFILE} element={soon('Profile')} />
+              <Route path={ROUTES.ADMIN_DASHBOARD} element={<AdminDashboardPage />} />
+              <Route path={ROUTES.ADMIN_COMPLAINTS} element={<AdminComplaintsPage />} />
+              <Route
+                path={`${ROUTES.ADMIN_COMPLAINTS}/:id`}
+                element={<AdminComplaintDetailsPage />}
+              />
+              {/* The key makes each status page start with its own fresh filters. */}
+              <Route
+                path={ROUTES.ADMIN_PENDING}
+                element={
+                  <AdminComplaintsPage
+                    key="pending"
+                    status={STATUS.PENDING}
+                    title="Pending complaints"
+                    description="Complaints waiting for review."
+                  />
+                }
+              />
+              <Route
+                path={ROUTES.ADMIN_IN_PROGRESS}
+                element={
+                  <AdminComplaintsPage
+                    key="in-progress"
+                    status={STATUS.IN_PROGRESS}
+                    title="In progress complaints"
+                    description="Complaints the concerned departments are working on."
+                  />
+                }
+              />
+              <Route
+                path={ROUTES.ADMIN_RESOLVED}
+                element={
+                  <AdminComplaintsPage
+                    key="resolved"
+                    status={STATUS.RESOLVED}
+                    title="Resolved complaints"
+                    description="Complaints that have been fixed."
+                  />
+                }
+              />
+              <Route
+                path={ROUTES.ADMIN_REJECTED}
+                element={
+                  <AdminComplaintsPage
+                    key="rejected"
+                    status={STATUS.REJECTED}
+                    title="Rejected complaints"
+                    description="Complaints that could not be acted on."
+                  />
+                }
+              />
+              <Route path={ROUTES.ADMIN_PROFILE} element={<ProfilePage />} />
+              {/* Wrong URL under /admin/: keep the sidebar */}
+              <Route path="/admin/*" element={<NotFoundPage inLayout />} />
             </Route>
 
             <Route path="*" element={<NotFoundPage />} />

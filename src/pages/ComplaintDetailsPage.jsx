@@ -2,14 +2,14 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 import PageHeader from '../components/PageHeader'
 import Panel from '../components/Panel'
 import EmptyState from '../components/EmptyState'
-import StatusBadge from '../components/StatusBadge'
+import ComplaintOverview from '../components/ComplaintOverview'
 import StatusTimeline from '../components/StatusTimeline'
 import Button from '../components/ui/Button'
 import { useAuth } from '../context/useAuth'
 import { useStudentComplaints } from '../hooks/useStudentComplaints'
-import { COMPLAINT_STATUSES as STATUS, STATUS_DESCRIPTIONS } from '../constants/statuses'
+import { COMPLAINT_STATUSES as STATUS } from '../constants/statuses'
 import { ROUTES } from '../constants/routes'
-import { formatDate, formatFileSize } from '../utils/complaints'
+import { formatDate } from '../utils/complaints'
 import './ComplaintDetailsPage.css'
 
 const BACK_BUTTON = (
@@ -56,8 +56,6 @@ export default function ComplaintDetailsPage() {
     )
   }
 
-  const { attachment } = complaint
-  const isImage = attachment?.type.startsWith('image/')
   const hasResponse = Boolean(complaint.adminResponse)
 
   return (
@@ -79,64 +77,8 @@ export default function ComplaintDetailsPage() {
       <div className="details">
         <div className="details__main">
           <Panel title="Complaint">
-            <div className="panel-body details__body">
-              <div className="details__status">
-                <StatusBadge status={complaint.status} />
-                <span className="details__status-text">
-                  {STATUS_DESCRIPTIONS[complaint.status]}
-                </span>
-              </div>
-
-              <dl className="detail-list">
-                <div className="detail-list__item">
-                  <dt>Complaint ID</dt>
-                  <dd>{complaint.id}</dd>
-                </div>
-                <div className="detail-list__item">
-                  <dt>Category</dt>
-                  <dd>{complaint.category}</dd>
-                </div>
-                <div className="detail-list__item">
-                  <dt>Location</dt>
-                  <dd>{complaint.location}</dd>
-                </div>
-                <div className="detail-list__item">
-                  <dt>Submitted on</dt>
-                  <dd>{formatDate(complaint.submittedOn)}</dd>
-                </div>
-              </dl>
-
-              <div>
-                <h3 className="details__subheading">Description</h3>
-                <p className="details__description">{complaint.description}</p>
-              </div>
-
-              <div>
-                <h3 className="details__subheading">Attachment</h3>
-                {attachment ? (
-                  <div className="attachment">
-                    {isImage && (
-                      <a href={attachment.url} target="_blank" rel="noreferrer">
-                        <img
-                          className="attachment__preview"
-                          src={attachment.url}
-                          alt={`Preview of ${attachment.name}`}
-                        />
-                      </a>
-                    )}
-                    <p>
-                      <a href={attachment.url} target="_blank" rel="noreferrer">
-                        {attachment.name}
-                      </a>{' '}
-                      <span className="details__muted">
-                        ({formatFileSize(attachment.size)}, opens in a new tab)
-                      </span>
-                    </p>
-                  </div>
-                ) : (
-                  <p className="details__muted">No file was attached.</p>
-                )}
-              </div>
+            <div className="panel-body">
+              <ComplaintOverview complaint={complaint} />
             </div>
           </Panel>
 

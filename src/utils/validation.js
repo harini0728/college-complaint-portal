@@ -1,4 +1,5 @@
 import { ROLES } from '../constants/roles'
+import { STATUS_LIST } from '../constants/statuses'
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 const ID_PATTERN = /^[A-Za-z0-9-]{4,20}$/
@@ -135,5 +136,30 @@ export function validateComplaint({ title, category, location, description, atta
   Object.entries(checks).forEach(([field, message]) => {
     if (message) errors[field] = message
   })
+  return errors
+}
+
+// ---------- Admin: update a complaint ----------
+
+export const ADMIN_RESPONSE_MAX = 1000
+const REJECTION_REASON_MIN = 10
+
+// requireResponse is true when the admin is rejecting a complaint: the student
+// must be told why, so a new response is needed.
+export function validateAdminUpdate({ status, response, requireResponse }) {
+  const errors = {}
+  const text = response.trim()
+
+  if (!STATUS_LIST.includes(status)) {
+    errors.status = 'Choose a status for this complaint.'
+  }
+
+  if (text.length > ADMIN_RESPONSE_MAX) {
+    errors.response = `Keep the response within ${ADMIN_RESPONSE_MAX} characters.`
+  } else if (requireResponse && !text) {
+    errors.response = 'Explain why this complaint is being rejected. The student will see it.'
+  } else if (requireResponse && text.length < REJECTION_REASON_MIN) {
+    errors.response = `Add a little more detail. The reason needs at least ${REJECTION_REASON_MIN} characters.`
+  }
   return errors
 }

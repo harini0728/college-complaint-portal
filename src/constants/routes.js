@@ -15,12 +15,18 @@ export const ROUTES = {
   ADMIN_PENDING: '/admin/pending',
   ADMIN_IN_PROGRESS: '/admin/in-progress',
   ADMIN_RESOLVED: '/admin/resolved',
+  ADMIN_REJECTED: '/admin/rejected',
   ADMIN_PROFILE: '/admin/profile',
 }
 
 // URL of one complaint's detail page, e.g. /student/complaints/CMP-1042
 export function studentComplaintPath(id) {
   return `${ROUTES.STUDENT_COMPLAINTS}/${id}`
+}
+
+// URL of one complaint's admin page, e.g. /admin/complaints/CMP-1042
+export function adminComplaintPath(id) {
+  return `${ROUTES.ADMIN_COMPLAINTS}/${id}`
 }
 
 // Where each role lands after signing in.
