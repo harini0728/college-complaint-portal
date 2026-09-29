@@ -1,38 +1,86 @@
-/* Left-side panel. Closed: slid off-screen to the left. Open: slides in.
-   visibility keeps the hidden links out of the keyboard tab order. */
+/* Left rail. Collapsed: a slim column of icons (--rail-width). Open: it grows
+   just wide enough (--sidebar-open-width) to show the labels, the user and
+   Logout, and sits over the page (dimmed by the backdrop) until closed.
+   The page itself always keeps room for the collapsed rail, so the rail never
+   covers content. */
 .sidebar {
   position: fixed;
   top: 0;
   bottom: 0;
   left: 0;
-  z-index: 1; /* below the ⋮ button, which sits in the panel's top-left corner */
+  z-index: 40;
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
-  width: min(18rem, 85vw);
-  padding: 0 var(--space-4) var(--space-5);
-  overflow-y: auto;
+  gap: var(--space-4);
+  width: var(--rail-width);
+  padding: 0 var(--space-2) var(--space-4);
+  overflow: hidden auto;
   background: var(--color-primary);
   color: var(--color-on-primary);
-  box-shadow: 8px 0 24px rgba(22, 34, 46, 0.3);
-  transform: translateX(-100%);
-  visibility: hidden;
-  transition: transform 0.25s ease, visibility 0s linear 0.25s;
+  will-change: width;
+  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease;
 }
 
 .sidebar--open {
-  transform: none;
-  visibility: visible;
-  transition-delay: 0s;
+  width: var(--sidebar-open-width);
+  box-shadow: 8px 0 24px rgba(22, 34, 46, 0.3);
 }
 
-/* Same height as the top bar, and the brand lines up with the one in the bar
-   (space for the ⋮ button on the left). */
-.sidebar__brand {
+/* The default focus ring is teal on teal here, so use white. */
+.sidebar :focus-visible {
+  outline-color: #ffffff;
+}
+
+/* Top row: just the ☰ button, in the same spot open or closed. It is exactly as
+   tall as the top bar so the two line up. */
+.sidebar__head {
   display: flex;
   align-items: center;
   min-height: 4rem;
-  padding-left: calc(44px + var(--space-3));
+}
+
+.sidebar__toggle {
+  flex: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  /* Centres the button in the collapsed rail. */
+  margin-left: calc((var(--rail-width) - var(--space-4) - 44px) / 2);
+  padding: 0;
+  color: var(--color-on-primary);
+  background: none;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.sidebar__toggle:hover,
+.sidebar--open .sidebar__toggle {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+/* Labels and the user block are hidden while collapsed. They fade in / out
+   with the width change; nowrap keeps each label on one line so it is never
+   squeezed or wrapped mid-animation. */
+.sidebar__label,
+.sidebar__user {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.15s ease, visibility 0s linear 0.15s;
+}
+
+.sidebar__label {
+  white-space: nowrap;
+}
+
+.sidebar--open .sidebar__label,
+.sidebar--open .sidebar__user {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity 0.2s ease 0.08s, visibility 0s;
 }
 
 .sidebar__nav {
@@ -47,13 +95,29 @@
   list-style: none;
 }
 
+/* Links and the Logout button share this look. The side padding is worked out
+   from the rail width so the icons sit centred in the collapsed rail and stay
+   put (no jumping) while the sidebar opens. */
 .sidebar__link {
-  display: block;
-  padding: 0.65rem var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 44px;
+  padding: 0 calc((var(--rail-width) - var(--space-4) - 22px) / 2);
+  font: inherit;
   font-size: 0.9375rem;
   color: #d3e6ec;
+  text-align: left;
   text-decoration: none;
+  background: none;
+  border: 0;
   border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.sidebar__icon {
+  flex: none;
 }
 
 .sidebar__link:hover {
@@ -68,21 +132,16 @@
   box-shadow: inset 3px 0 0 #ffffff;
 }
 
-/* The default focus ring is teal on teal here, so use white. */
-.sidebar :focus-visible {
-  outline-color: #ffffff;
-}
-
 .sidebar__footer {
   display: grid;
-  gap: var(--space-4);
+  gap: var(--space-3);
   padding-top: var(--space-4);
   border-top: 1px solid rgba(255, 255, 255, 0.2);
 }
 
 .sidebar__user {
   display: grid;
-  padding: 0 var(--space-2);
+  padding: 0 var(--space-3);
   overflow-wrap: anywhere;
 }
 
@@ -96,22 +155,15 @@
 }
 
 @media (max-width: 899px) {
-  .sidebar__brand {
+  .sidebar__head {
     min-height: 3.75rem;
-  }
-
-  .sidebar__brand .brand__name {
-    font-size: var(--text-base);
-  }
-
-  .sidebar__brand .brand__logo {
-    width: 1.75rem;
-    height: 1.75rem;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .sidebar {
+  .sidebar,
+  .sidebar__label,
+  .sidebar__user {
     transition: none;
   }
 }

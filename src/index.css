@@ -56,6 +56,10 @@
   --radius-sm: 6px;
   --radius-md: 10px;
 
+  /* Sidebar: slim icon rail when collapsed, sized to its labels when open. */
+  --rail-width: 4.5rem;
+  --sidebar-open-width: 13.5rem;
+
   color-scheme: light;
   font-family: var(--font-body);
   font-size: 16px;
@@ -64,6 +68,13 @@
   background: var(--color-page);
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+}
+
+/* A slightly slimmer icon rail on small screens. */
+@media (max-width: 899px) {
+  :root {
+    --rail-width: 4rem;
+  }
 }
 
 *,

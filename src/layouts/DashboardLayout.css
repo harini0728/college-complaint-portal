@@ -1,5 +1,8 @@
 .shell {
   min-height: 100svh;
+  /* Room for the collapsed icon rail, so it never sits on top of the page.
+     The expanded menu overlays the page only while it is open. */
+  padding-left: var(--rail-width);
 }
 
 .shell__main {
@@ -15,56 +18,32 @@
   margin: 0 auto;
 }
 
-/* Top bar (all screen sizes): room on the left for the ⋮ button, then the brand. */
+/* Top bar (all screen sizes): sits to the right of the sidebar rail. It is
+   layered below the sidebar so it can never cover the ☰ button or the menu. */
 .shell__topbar {
   position: relative;
-  z-index: 40;
+  z-index: 20;
   display: flex;
   align-items: center;
   min-height: 4rem;
-  padding: 0 var(--space-4) 0 calc(var(--space-4) + 44px + var(--space-3));
+  padding: 0 var(--space-4);
   background: var(--color-primary);
   color: var(--color-on-primary);
+}
+
+/* The open menu covers the left of the top bar, so fade the brand out of the
+   way (instead of leaving it half hidden behind the menu). */
+.shell__topbar .brand {
+  transition: opacity 0.2s ease;
+}
+
+.shell--menu-open .shell__topbar .brand {
+  opacity: 0;
 }
 
 /* The default focus ring is teal on teal here, so use white. */
 .shell__topbar :focus-visible {
   outline-color: #ffffff;
-}
-
-/* ⋮ button: fixed at the top-left so it is always there to open or close the
-   menu, and it stays above the menu panel while that is open. */
-.shell__menu-button {
-  position: fixed;
-  top: 0.5rem; /* centred in the 4rem bar */
-  left: var(--space-4);
-  z-index: 2;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  color: var(--color-on-primary);
-  background: var(--color-primary);
-  border: 1px solid rgba(255, 255, 255, 0.4);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: background-color 0.15s ease;
-}
-
-.shell__menu-button:hover,
-.shell__menu-button--open {
-  background: var(--color-primary-hover);
-}
-
-.shell__menu-button svg {
-  transition: transform 0.25s ease;
-}
-
-/* The three dots turn sideways while the menu is open. */
-.shell__menu-button--open svg {
-  transform: rotate(90deg);
 }
 
 /* Dims the page behind the open menu. Click it to close. */
@@ -89,10 +68,6 @@
     min-height: 3.75rem;
   }
 
-  .shell__menu-button {
-    top: 0.4375rem; /* centred in the 3.75rem bar */
-  }
-
   .shell__topbar .brand__name {
     font-size: var(--text-base);
   }
@@ -108,7 +83,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .shell__menu-button svg,
+  .shell__topbar .brand,
   .shell__backdrop {
     transition: none;
   }

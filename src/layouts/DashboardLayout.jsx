@@ -8,7 +8,8 @@ import './DashboardLayout.css'
 
 const MENU_ID = 'app-menu'
 
-// Shell for every signed-in page: top bar with a three-dot (⋮) button that opens a left-side menu + content area.
+// Shell for every signed-in page: a slim icon rail on the left (with the ☰
+// button that expands it to show labels), a top bar and the content area.
 // Student and admin pages both use this; the menu items depend on the role.
 export default function DashboardLayout() {
   const { user, logout } = useAuth()
@@ -19,7 +20,7 @@ export default function DashboardLayout() {
 
   const closeMenu = () => setMenuOpen(false)
 
-  // Pressing Escape closes the menu and returns focus to the ⋮ button.
+  // Pressing Escape collapses the menu and returns focus to the ☰ button.
   useEffect(() => {
     if (!menuOpen) return undefined
     const handleKeyDown = (event) => {
@@ -41,46 +42,32 @@ export default function DashboardLayout() {
   }, [pathname])
 
   return (
-    <div className="shell">
+    <div className={`shell${menuOpen ? ' shell--menu-open' : ''}`}>
       <a className="skip-link" href="#main-content">
         Skip to main content
       </a>
 
-      {/* Top bar: ⋮ button on the left (always visible), brand next to it */}
-      <header className="shell__topbar">
-        <button
-          type="button"
-          ref={menuButtonRef}
-          className={`shell__menu-button${menuOpen ? ' shell__menu-button--open' : ''}`}
-          aria-label={menuOpen ? 'Close menu' : 'Open menu'}
-          aria-expanded={menuOpen}
-          aria-controls={MENU_ID}
-          onClick={() => setMenuOpen((isOpen) => !isOpen)}
-        >
-          <svg viewBox="0 0 20 20" width="20" height="20" aria-hidden="true" focusable="false">
-            <circle cx="10" cy="4" r="1.75" fill="currentColor" />
-            <circle cx="10" cy="10" r="1.75" fill="currentColor" />
-            <circle cx="10" cy="16" r="1.75" fill="currentColor" />
-          </svg>
-        </button>
+      <Sidebar
+        id={MENU_ID}
+        items={NAV_BY_ROLE[user.role]}
+        user={user}
+        open={menuOpen}
+        onToggle={() => setMenuOpen((isOpen) => !isOpen)}
+        onNavigate={closeMenu}
+        onLogout={logout}
+        toggleRef={menuButtonRef}
+      />
 
-        <BrandMark inverse />
-
-        <Sidebar
-          id={MENU_ID}
-          items={NAV_BY_ROLE[user.role]}
-          user={user}
-          open={menuOpen}
-          onNavigate={closeMenu}
-          onLogout={logout}
-        />
-      </header>
-
+      {/* Dims the page behind the expanded menu. Click it to collapse. */}
       <div
         className={`shell__backdrop${menuOpen ? ' shell__backdrop--visible' : ''}`}
         onClick={closeMenu}
         aria-hidden="true"
       />
+
+      <header className="shell__topbar">
+        <BrandMark inverse />
+      </header>
 
       <main className="shell__main" id="main-content" ref={mainRef} tabIndex={-1}>
         <div className="shell__content">
