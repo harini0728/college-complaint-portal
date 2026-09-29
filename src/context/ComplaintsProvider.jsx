@@ -1,69 +1,150 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { ComplaintsContext } from './ComplaintsContext'
-import { COMPLAINTS } from '../data/complaints'
-import { COMPLAINT_STATUSES as STATUS } from '../constants/statuses'
-import { buildHistory, generateComplaintId, todayISO } from '../utils/complaints'
+import { useAuth } from './useAuth'
 
-// Keeps complaints in memory so a new complaint shows up on every page.
-// Students add complaints and admins update them; both sides read the same list,
-// so a change made by one is visible to the other straight away.
-// It starts from the dummy data and resets when the page is refreshed.
-// When the backend exists, addComplaint and updateComplaint become API calls.
+const API_URL = 'http://localhost:5000/api'
+
+function getToken() {
+  return localStorage.getItem('ccp_token')
+}
+
+function mapComplaint(complaint) {
+  return {
+    ...complaint,
+
+    submittedOn: complaint.createdAt || complaint.updatedAt,
+submittedBy: {
+  id:
+    complaint.submittedBy?.id ||
+    complaint.submittedBy?._id ||
+    complaint.submittedBy ||
+    '',
+  name: complaint.submittedBy?.name || '',
+  department: complaint.submittedBy?.department || '',
+},
+
+    attachment: complaint.attachment || null,
+    adminResponse: complaint.adminResponse || '',
+
+    history: [
+      {
+        status: complaint.status,
+        date: complaint.createdAt || complaint.updatedAt,
+      },
+    ],
+  }
+}
+
 export default function ComplaintsProvider({ children }) {
-  const [complaints, setComplaints] = useState(() =>
-    COMPLAINTS.map((complaint) => ({ ...complaint, history: buildHistory(complaint) })),
-  )
+  const { user } = useAuth()
 
-  const addComplaint = useCallback(
-    ({ title, category, location, description, attachment }, student) => {
-      const complaint = {
-        id: generateComplaintId(complaints),
-        title,
-        category,
-        location,
-        description,
-        attachment: attachment ?? null,
-        submittedOn: todayISO(),
-        status: STATUS.PENDING,
-        adminResponse: '',
-        history: [{ status: STATUS.PENDING, date: todayISO() }],
-        submittedBy: {
-          id: student.id,
-          name: student.name,
-          department: student.department,
+  const [complaints, setComplaints] = useState([])
+  const [loading, setLoading] = useState(true)
+
+  // Load complaints from MongoDB
+  const fetchComplaints = useCallback(async () => {
+    if (!user) {
+      setComplaints([])
+      setLoading(false)
+      return
+    }
+
+    const token = getToken()
+
+    if (!token) {
+      setComplaints([])
+      setLoading(false)
+      return
+    }
+
+    try {
+      setLoading(true)
+
+      const response = await fetch(`${API_URL}/complaints/my`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
         },
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data?.message || 'Failed to load complaints')
       }
-      // Functional form: never overwrites an admin update that happened meanwhile.
-      // (The ID comes from the current list. The backend will assign IDs later.)
+
+      setComplaints(
+        (data.complaints || []).map(mapComplaint),
+      )
+    } catch (error) {
+      console.error('Failed to load complaints:', error)
+      setComplaints([])
+    } finally {
+      setLoading(false)
+    }
+  }, [user])
+
+  useEffect(() => {
+    fetchComplaints()
+  }, [fetchComplaints])
+
+  // Submit complaint to MongoDB
+  const addComplaint = useCallback(
+    async ({ title, category, location, description, attachment }) => {
+      const token = getToken()
+
+      if (!token) {
+        throw new Error('You are not logged in.')
+      }
+
+      const response = await fetch(`${API_URL}/complaints`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          title,
+          category,
+          description,
+          attachment: attachment || null,
+        }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(
+          data?.message || 'Failed to submit complaint',
+        )
+      }
+
+      const complaint = mapComplaint(data.complaint)
+
       setComplaints((current) => [complaint, ...current])
+
       return complaint
     },
-    [complaints],
+    [],
   )
 
-  // Admin action: set the status and the response for one complaint.
-  // A new timeline entry is added only when the status really changes.
-  const updateComplaint = useCallback((id, { status, adminResponse }) => {
-    setComplaints((current) =>
-      current.map((complaint) => {
-        if (complaint.id !== id) return complaint
-        const changed = status !== complaint.status
-        return {
-          ...complaint,
-          status,
-          adminResponse,
-          history: changed
-            ? [...complaint.history, { status, date: todayISO() }]
-            : complaint.history,
-        }
-      }),
-    )
-  }, [])
+  // Admin update will be connected later
+  const updateComplaint = useCallback(async () => {
+    await fetchComplaints()
+  }, [fetchComplaints])
 
   const value = useMemo(
-    () => ({ complaints, addComplaint, updateComplaint }),
-    [complaints, addComplaint, updateComplaint],
+    () => ({
+      complaints,
+      loading,
+      addComplaint,
+      updateComplaint,
+    }),
+    [complaints, loading, addComplaint, updateComplaint],
   )
 
-  return <ComplaintsContext.Provider value={value}>{children}</ComplaintsContext.Provider>
+  return (
+    <ComplaintsContext.Provider value={value}>
+      {children}
+    </ComplaintsContext.Provider>
+  )
 }

@@ -1,11 +1,11 @@
 import { useCallback, useMemo, useState } from 'react'
 import { AuthContext } from './AuthContext'
-import { findUser } from '../data/users'
 
 const STORAGE_KEY = 'ccp_user'
-const FAKE_NETWORK_DELAY_MS = 700
+const TOKEN_KEY = 'ccp_token'
+const API_URL = 'http://localhost:5000/api'
 
-// Read the saved user (if any) so a page refresh keeps you signed in.
+// Read the saved user so a page refresh keeps you signed in.
 function loadStoredUser() {
   try {
     const saved = localStorage.getItem(STORAGE_KEY)
@@ -18,30 +18,70 @@ function loadStoredUser() {
 export default function AuthProvider({ children }) {
   const [user, setUser] = useState(loadStoredUser)
 
-  // Frontend-only login: checks the dummy accounts after a short fake delay
-  // so the loading state is visible. Replace with an API call later.
+  // Login using the real backend API.
   const login = useCallback(async ({ identifier, password, role }) => {
-    await new Promise((resolve) => setTimeout(resolve, FAKE_NETWORK_DELAY_MS))
+    try {
+      const response = await fetch(`${API_URL}/auth/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: identifier,
+          password,
+        }),
+      })
 
-    const foundUser = findUser({ identifier, password, role })
-    if (!foundUser) {
+      const data = await response.json()
+
+      if (!response.ok) {
+        return {
+          ok: false,
+          error: data?.message || 'The ID or password is incorrect. Check both and try again.',
+        }
+      }
+
+      // Backend returns the authenticated user and JWT.
+      const loggedInUser = data.user
+
+      // Keep role validation on the frontend because the current
+      // login page allows the user to select a role.
+      if (role && loggedInUser.role !== role) {
+        return {
+          ok: false,
+          error: `This account is registered as ${loggedInUser.role}. Please select the correct role.`,
+        }
+      }
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(loggedInUser))
+      localStorage.setItem(TOKEN_KEY, data.token)
+
+      setUser(loggedInUser)
+
+      return {
+        ok: true,
+        user: loggedInUser,
+      }
+    } catch (error) {
+      console.error('Login error:', error)
+
       return {
         ok: false,
-        error: 'The ID or password is incorrect. Check both and try again.',
+        error: 'Unable to connect to the server. Make sure the backend is running on port 5000.',
       }
     }
-
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(foundUser))
-    setUser(foundUser)
-    return { ok: true, user: foundUser }
   }, [])
 
   const logout = useCallback(() => {
     localStorage.removeItem(STORAGE_KEY)
+    localStorage.removeItem(TOKEN_KEY)
     setUser(null)
   }, [])
 
-  const value = useMemo(() => ({ user, login, logout }), [user, login, logout])
+  const value = useMemo(
+    () => ({ user, login, logout }),
+    [user, login, logout],
+  )
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
 }

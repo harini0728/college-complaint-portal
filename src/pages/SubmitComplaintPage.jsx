@@ -14,7 +14,7 @@ import { ROUTES, studentComplaintPath } from '../constants/routes'
 import { ATTACHMENT_RULES, COMPLAINT_LIMITS, validateComplaint } from '../utils/validation'
 import './SubmitComplaintPage.css'
 
-const FAKE_NETWORK_DELAY_MS = 700
+
 const FIELD_ORDER = ['title', 'category', 'location', 'description', 'attachment']
 const EMPTY_VALUES = { title: '', category: '', location: '', description: '' }
 
@@ -73,9 +73,9 @@ export default function SubmitComplaintPage() {
     }
 
     setIsSubmitting(true)
-    await new Promise((resolve) => setTimeout(resolve, FAKE_NETWORK_DELAY_MS))
 
-    const complaint = addComplaint(
+
+   const complaint = await addComplaint(
       {
         title: values.title.trim(),
         category: values.category,
