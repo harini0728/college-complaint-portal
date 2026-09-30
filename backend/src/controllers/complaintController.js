@@ -4,6 +4,73 @@ import { ROLES } from '../constants/roles.js'
 
 const COMPLAINT_STATUSES = ['Pending', 'In Progress', 'Resolved', 'Rejected']
 const ADMIN_RESPONSE_MAX_LENGTH = 1000
+const SEARCH_MAX_LENGTH = 100
+const SORT_OPTIONS = ['newest', 'oldest']
+const DEFAULT_SORT = 'newest'
+
+// Reads and validates the admin list query string: ?status=&search=&sort=
+// Query values can arrive as arrays (?status=a&status=b), so anything that is
+// not a plain string is rejected before it can reach a database query.
+// A blank value (?status=) is treated as "not provided".
+function parseAdminComplaintQuery(query) {
+  const errors = []
+  const filters = { status: null, search: null, sort: DEFAULT_SORT }
+
+  const readString = (field) => {
+    const value = query[field]
+    if (value === undefined) return null
+    if (typeof value !== 'string') {
+      errors.push({ field, message: `${field} must be a single text value` })
+      return null
+    }
+    return value.trim() || null
+  }
+
+  const status = readString('status')
+  if (status !== null) {
+    if (COMPLAINT_STATUSES.includes(status)) {
+      filters.status = status
+    } else {
+      errors.push({
+        field: 'status',
+        message: `Status must be one of: ${COMPLAINT_STATUSES.join(', ')}`,
+      })
+    }
+  }
+
+  const search = readString('search')
+  if (search !== null) {
+    if (search.length > SEARCH_MAX_LENGTH) {
+      errors.push({
+        field: 'search',
+        message: `Search must be at most ${SEARCH_MAX_LENGTH} characters`,
+      })
+    } else {
+      filters.search = search
+    }
+  }
+
+  const sort = readString('sort')
+  if (sort !== null) {
+    if (SORT_OPTIONS.includes(sort)) {
+      filters.sort = sort
+    } else {
+      errors.push({
+        field: 'sort',
+        message: `Sort must be one of: ${SORT_OPTIONS.join(', ')}`,
+      })
+    }
+  }
+
+  if (errors.length > 0) {
+    throw new ApiError(400, 'Validation failed', errors)
+  }
+
+  return filters
+}
+
+// Escapes regex special characters so the search text is matched literally.
+const escapeRegex = (text) => text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
 // POST /api/complaints
 export async function createComplaint(req, res) {
@@ -70,15 +137,43 @@ export async function getComplaintById(req, res) {
   })
 }
 
-// GET /api/complaints  (admin only)
-export async function getAllComplaints(_req, res) {
-  const complaints = await Complaint.find()
+// GET /api/complaints  (admin only — enforced in the route)
+// Optional query params:
+//   status  Pending | In Progress | Resolved | Rejected
+//   search  text matched (case-insensitive) in title, description, category, location
+//   sort    newest (default) | oldest
+// With no params it returns every complaint, newest first.
+export async function getAllComplaints(req, res) {
+  const { status, search, sort } = parseAdminComplaintQuery(req.query)
+
+  const filter = {}
+
+  if (status) {
+    filter.status = status
+  }
+
+  if (search) {
+    const pattern = new RegExp(escapeRegex(search), 'i')
+    filter.$or = [
+      { title: pattern },
+      { description: pattern },
+      { category: pattern },
+      { location: pattern },
+    ]
+  }
+
+  // _id is a tie-breaker so complaints created in the same millisecond keep a
+  // stable order.
+  const direction = sort === 'oldest' ? 1 : -1
+
+  const complaints = await Complaint.find(filter)
     .populate('submittedBy', 'name email')
-    .sort({ createdAt: -1 })
+    .sort({ createdAt: direction, _id: direction })
 
   res.json({
     success: true,
     count: complaints.length,
+    filters: { status, search, sort },
     complaints,
   })
 }
