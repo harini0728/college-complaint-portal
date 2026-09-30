@@ -105,6 +105,7 @@ export default function ComplaintsProvider({ children }) {
         body: JSON.stringify({
           title,
           category,
+          location,
           description,
           attachment: attachment || null,
         }),

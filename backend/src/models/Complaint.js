@@ -24,6 +24,14 @@ const complaintSchema = new mongoose.Schema(
       trim: true,
     },
 
+    location: {
+      type: String,
+      required: [true, 'Complaint location is required'],
+      trim: true,
+      minlength: [3, 'Location must be at least 3 characters'],
+      maxlength: [100, 'Location must be at most 100 characters'],
+    },
+
     status: {
       type: String,
       enum: ['Pending', 'In Progress', 'Resolved', 'Rejected'],

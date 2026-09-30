@@ -3,12 +3,12 @@ import ApiError from '../utils/ApiError.js'
 
 // POST /api/complaints
 export async function createComplaint(req, res) {
-  const { title, description, category, attachment } = req.body ?? {}
+  const { title, description, category, location, attachment } = req.body ?? {}
 
-  if (!title || !description || !category) {
+  if (!title || !description || !category || !location) {
     throw new ApiError(
       400,
-      'Title, description, and category are required',
+      'Title, description, category, and location are required',
     )
   }
 
@@ -16,6 +16,7 @@ export async function createComplaint(req, res) {
     title,
     description,
     category,
+    location,
     attachment: attachment || null,
     submittedBy: req.user._id,
   })
