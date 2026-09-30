@@ -4,6 +4,7 @@ import {
   getAllComplaints,
   getMyComplaints,
   getComplaintById,
+  updateComplaint,
 } from '../controllers/complaintController.js'
 import { protect, authorize } from '../middleware/authMiddleware.js'
 import { ROLES } from '../constants/roles.js'
@@ -21,5 +22,9 @@ router.get('/', authorize(ROLES.ADMIN), getAllComplaints)
 
 // Shared: admin can open any complaint, a student only their own
 router.get('/:id', getComplaintById)
+
+// Admin only: update status and/or admin response.
+// Students get 403 here, so they can never edit a complaint.
+router.patch('/:id', authorize(ROLES.ADMIN), updateComplaint)
 
 export default router
