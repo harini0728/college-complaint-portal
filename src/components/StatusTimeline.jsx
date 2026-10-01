@@ -1,4 +1,4 @@
-import { formatDate, getTimeline } from '../utils/complaints'
+import { formatDateTime, getTimeline } from '../utils/complaints'
 import './StatusTimeline.css'
 
 const STATE_TEXT = {
@@ -7,7 +7,8 @@ const STATE_TEXT = {
   upcoming: 'Not reached yet',
 }
 
-// Vertical list of the stages a complaint moves through.
+// Vertical list of the stages a complaint moves through, oldest first. Each step
+// shows when it happened and the admin's response sent with it, if any.
 export default function StatusTimeline({ complaint }) {
   const steps = getTimeline(complaint)
 
@@ -27,8 +28,14 @@ export default function StatusTimeline({ complaint }) {
               {step.label}
               <span className="visually-hidden"> ({STATE_TEXT[step.state]})</span>
             </p>
-            {step.date && <p className="timeline__date">{formatDate(step.date)}</p>}
+            {step.date && <p className="timeline__date">{formatDateTime(step.date)}</p>}
             <p className="timeline__text">{step.description}</p>
+            {step.response && (
+              <p className="timeline__response">
+                <span className="visually-hidden">Response from the administration: </span>
+                {step.response}
+              </p>
+            )}
           </div>
         </li>
       ))}

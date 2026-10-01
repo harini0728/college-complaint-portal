@@ -1,6 +1,7 @@
 import Complaint from '../models/Complaint.js'
 import ApiError from '../utils/ApiError.js'
 import { ROLES } from '../constants/roles.js'
+import { buildBaselineHistory } from '../utils/statusHistory.js'
 
 const COMPLAINT_STATUSES = ['Pending', 'In Progress', 'Resolved', 'Rejected']
 const ADMIN_RESPONSE_MAX_LENGTH = 1000
@@ -183,7 +184,11 @@ export async function getAllComplaints(req, res) {
 //   status        one of Pending | In Progress | Resolved | Rejected
 //   adminResponse text to show the student; "" or null clears it
 // Nothing else on the complaint can be changed through this endpoint: the
-// fields are picked one by one, so extra keys in the body are ignored.
+// fields are picked one by one, so extra keys in the body are ignored (this
+// includes statusHistory, which only this function adds to).
+// A change to a different status adds an entry to statusHistory with the new
+// status, the time, and the response sent in the same request (if any).
+// Re-sending the current status, or sending only a response, adds no entry.
 export async function updateComplaint(req, res) {
   const body = req.body
 
@@ -241,6 +246,14 @@ export async function updateComplaint(req, res) {
     throw new ApiError(404, 'Complaint not found')
   }
 
+  // Complaints created before the history existed have no entries. Save their
+  // starting point now, before the status below is changed.
+  if (complaint.statusHistory.length === 0) {
+    complaint.statusHistory = buildBaselineHistory(complaint)
+  }
+
+  const statusChanged = hasStatus && body.status !== complaint.status
+
   if (hasStatus) {
     complaint.status = body.status
 
@@ -256,6 +269,14 @@ export async function updateComplaint(req, res) {
 
   if (hasResponse) {
     complaint.adminResponse = nextResponse
+  }
+
+  if (statusChanged) {
+    complaint.statusHistory.push({
+      status: body.status,
+      changedAt: new Date(),
+      adminResponse: hasResponse ? nextResponse : null,
+    })
   }
 
   // Validate only what changed, so an older complaint that is missing a field

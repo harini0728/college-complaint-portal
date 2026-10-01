@@ -1,5 +1,5 @@
-import { COMPLAINT_STATUSES as STATUS } from '../constants/statuses'
 import { apiRequest } from '../utils/api'
+import { normalizeHistory } from '../utils/complaints'
 
 // ---------- Backend -> UI shape ----------
 // The pages were built around a slightly different complaint object than the
@@ -29,21 +29,6 @@ function mapAttachment(attachment) {
   return null
 }
 
-// The backend does not store a status history, so the timeline is built from
-// what it does store. Only the resolved date is known exactly (`resolvedAt`);
-// the other steps are shown without a date rather than with a wrong one.
-function buildHistory(status, submittedOn, resolvedAt) {
-  const history = [{ status: STATUS.PENDING, date: submittedOn }]
-  if (status === STATUS.IN_PROGRESS) {
-    history.push({ status: STATUS.IN_PROGRESS })
-  } else if (status === STATUS.RESOLVED) {
-    history.push({ status: STATUS.IN_PROGRESS }, { status: STATUS.RESOLVED, date: resolvedAt || undefined })
-  } else if (status === STATUS.REJECTED) {
-    history.push({ status: STATUS.REJECTED })
-  }
-  return history
-}
-
 export function mapAdminComplaint(raw) {
   // For admins the backend fills in submittedBy as { id, name, email }.
   // It can be null if that student's account was deleted.
@@ -62,7 +47,8 @@ export function mapAdminComplaint(raw) {
     },
     attachment: mapAttachment(raw.attachment),
     adminResponse: raw.adminResponse || '',
-    history: buildHistory(raw.status, submittedOn, raw.resolvedAt),
+    // The status timeline, from the backend's `statusHistory` (oldest first).
+    history: normalizeHistory(raw.statusHistory),
   }
 }
 

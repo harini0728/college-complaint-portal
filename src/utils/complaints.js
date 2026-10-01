@@ -1,4 +1,4 @@
-import { COMPLAINT_STATUSES as STATUS } from '../constants/statuses'
+import { COMPLAINT_STATUSES as STATUS, STATUS_LIST } from '../constants/statuses'
 
 // "In Progress" -> "in-progress" (used for CSS class names)
 export function statusSlug(status) {
@@ -12,6 +12,23 @@ export function formatDate(isoDate) {
     month: 'short',
     year: 'numeric',
     timeZone: 'UTC',
+  })
+}
+
+// "2026-09-30T14:05:00.000Z" -> "30 Sep 2026, 7:35 pm" in the viewer's own time
+// zone. A date with no time ("2026-09-24") is shown as a date only.
+export function formatDateTime(value) {
+  if (/^\d{4}-\d{2}-\d{2}$/.test(value)) return formatDate(value)
+
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return ''
+
+  return date.toLocaleString('en-IN', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
   })
 }
 
@@ -133,10 +150,30 @@ export function percentOf(count, total) {
 
 // ---------- Status history and timeline ----------
 
-// Every complaint keeps a history: [{ status, date }], oldest first. The first
-// entry is the submission. The admin adds one entry each time the status changes.
-// The dummy complaints have no history yet, so this builds a simple one from
-// their current status (the dates of the middle steps are unknown, so left out).
+// A complaint's history is [{ status, date, response }], oldest first. The first
+// entry is the submission; after it comes one entry each time an admin changed
+// the status, with the time of the change and the response sent with it ('' if none).
+//
+// The backend sends it as `statusHistory`: [{ status, changedAt, adminResponse }].
+// This turns that into the shape above, in time order, and skips entries that
+// are unusable. Returns [] when there is no history.
+export function normalizeHistory(statusHistory) {
+  if (!Array.isArray(statusHistory)) return []
+
+  return statusHistory
+    .filter((entry) => entry && STATUS_LIST.includes(entry.status) && entry.changedAt)
+    .map((entry, index) => ({
+      index,
+      status: entry.status,
+      date: entry.changedAt,
+      response: entry.adminResponse || '',
+    }))
+    .sort((a, b) => new Date(a.date) - new Date(b.date) || a.index - b.index)
+    .map(({ status, date, response }) => ({ status, date, response }))
+}
+
+// Only used when a complaint has no history at all. Builds a simple one from
+// its current status (the dates of the middle steps are unknown, so left out).
 export function buildHistory(complaint) {
   const history = [{ status: STATUS.PENDING, date: complaint.submittedOn }]
   if (complaint.status === STATUS.IN_PROGRESS) {
@@ -160,9 +197,10 @@ const STEP_TEXT = {
 
 // The steps shown in the status timeline (student and admin pages).
 // Each step is 'done', 'current' or 'upcoming'. Steps come from the complaint's
-// history, followed by the stages that are still ahead.
+// history (oldest first), followed by the stages that are still ahead. A step
+// carries the admin response sent with that status change, when there was one.
 export function getTimeline(complaint) {
-  const history = complaint.history ?? buildHistory(complaint)
+  const history = complaint.history?.length ? complaint.history : buildHistory(complaint)
 
   const steps = [
     {
@@ -180,6 +218,7 @@ export function getTimeline(complaint) {
       label: entry.status,
       description: STEP_TEXT[entry.status],
       date: entry.date,
+      response: entry.response || undefined,
       state: 'done',
       tone: entry.status === STATUS.REJECTED ? 'rejected' : undefined,
     })
