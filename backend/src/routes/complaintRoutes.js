@@ -2,6 +2,7 @@ import { Router } from 'express'
 import {
   createComplaint,
   getAllComplaints,
+  getComplaintSummary,
   getMyComplaints,
   getComplaintById,
   updateComplaint,
@@ -18,6 +19,8 @@ router.post('/', createComplaint)
 router.get('/my', getMyComplaints)
 
 // Admin
+// Must stay above '/:id', otherwise "summary" would be read as a complaint id.
+router.get('/summary', authorize(ROLES.ADMIN), getComplaintSummary)
 router.get('/', authorize(ROLES.ADMIN), getAllComplaints)
 
 // Shared: admin can open any complaint, a student only their own

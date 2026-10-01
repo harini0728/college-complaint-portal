@@ -8,6 +8,8 @@ const ADMIN_RESPONSE_MAX_LENGTH = 1000
 const SEARCH_MAX_LENGTH = 100
 const SORT_OPTIONS = ['newest', 'oldest']
 const DEFAULT_SORT = 'newest'
+// How many of the newest complaints the admin dashboard lists.
+const DASHBOARD_RECENT_COUNT = 5
 
 // Reads and validates the admin list query string: ?status=&search=&sort=
 // Query values can arrive as arrays (?status=a&status=b), so anything that is
@@ -176,6 +178,57 @@ export async function getAllComplaints(req, res) {
     count: complaints.length,
     filters: { status, search, sort },
     complaints,
+  })
+}
+
+// GET /api/complaints/summary  (admin only — enforced in the route)
+// Everything the admin dashboard shows, in one request. It is worked out from
+// MongoDB on every call (nothing is cached or stored), so the numbers always
+// match the complaints as they are right now, including after a status change.
+//   counts            { total, pending, inProgress, resolved, rejected }
+//   categories        [{ category, count }], the biggest category first
+//   recentComplaints  the newest complaints, with the student's name and email
+// `total` is the number of complaints in the collection, so it can never
+// disagree with the list page.
+export async function getComplaintSummary(_req, res) {
+  const [statusRows, categoryRows, recentComplaints] = await Promise.all([
+    // The database does the counting; no complaint is sent to Node for this.
+    Complaint.aggregate([{ $group: { _id: '$status', count: { $sum: 1 } } }]),
+    Complaint.aggregate([
+      { $group: { _id: '$category', count: { $sum: 1 } } },
+      { $sort: { count: -1, _id: 1 } },
+    ]),
+    // Only the fields a dashboard row needs. Same order as the admin list
+    // (newest first, _id as the tie-breaker).
+    Complaint.find()
+      .select('title category location status createdAt updatedAt submittedBy')
+      .populate('submittedBy', 'name email')
+      .sort({ createdAt: -1, _id: -1 })
+      .limit(DASHBOARD_RECENT_COUNT),
+  ])
+
+  const countOf = (status) =>
+    statusRows.find((row) => row._id === status)?.count ?? 0
+
+  const counts = {
+    total: statusRows.reduce((sum, row) => sum + row.count, 0),
+    pending: countOf('Pending'),
+    inProgress: countOf('In Progress'),
+    resolved: countOf('Resolved'),
+    rejected: countOf('Rejected'),
+  }
+
+  const categories = categoryRows
+    .filter((row) => row._id)
+    .map((row) => ({ category: row._id, count: row.count }))
+
+  // Never let a browser or proxy show yesterday's numbers.
+  res.set('Cache-Control', 'no-store')
+  res.json({
+    success: true,
+    counts,
+    categories,
+    recentComplaints,
   })
 }
 

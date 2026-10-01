@@ -8,20 +8,15 @@ import Button from '../components/ui/Button'
 import ComplaintList, { ComplaintListSkeleton } from '../components/ComplaintList'
 import { StatusBreakdown, CategoryBreakdown } from '../components/admin/AdminCharts'
 import { useAuth } from '../context/useAuth'
-import { useAllComplaints } from '../hooks/useAllComplaints'
+import { useAdminDashboard } from '../hooks/useAdminDashboard'
 import { COMPLAINT_STATUSES as STATUS } from '../constants/statuses'
 import { ROUTES, adminComplaintPath } from '../constants/routes'
-import { countByCategory, countByStatus, sortComplaints } from '../utils/complaints'
 import './AdminDashboardPage.css'
-
-const RECENT_COUNT = 5
 
 export default function AdminDashboardPage() {
   const { user } = useAuth()
-  const { complaints, loading, error, reload } = useAllComplaints()
-
-  const counts = countByStatus(complaints)
-  const recent = sortComplaints(complaints, 'newest').slice(0, RECENT_COUNT)
+  // Counts, category totals and the newest complaints all come from the server.
+  const { counts, categories, recent, loading, error, reload } = useAdminDashboard()
 
   return (
     <>
@@ -90,7 +85,7 @@ export default function AdminDashboardPage() {
               {loading ? (
                 <span className="skeleton admin-dashboard__skeleton" />
               ) : (
-                <CategoryBreakdown categories={countByCategory(complaints)} />
+                <CategoryBreakdown categories={categories} />
               )}
             </div>
           </Panel>

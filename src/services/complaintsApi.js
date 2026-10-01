@@ -62,6 +62,20 @@ export async function fetchAdminComplaints({ status, search, sort } = {}, signal
   return { complaints, count: data.count ?? complaints.length }
 }
 
+// GET /api/complaints/summary
+// Resolves with { counts, categories, recent } for the admin dashboard:
+//   counts      { total, pending, inProgress, resolved, rejected }
+//   categories  [{ category, count }], biggest first
+//   recent      the newest complaints, in the same shape as the list page
+export async function fetchAdminDashboardSummary(signal) {
+  const data = await apiRequest('/complaints/summary', { signal })
+  return {
+    counts: { total: 0, pending: 0, inProgress: 0, resolved: 0, rejected: 0, ...data.counts },
+    categories: data.categories ?? [],
+    recent: (data.recentComplaints ?? []).map(mapAdminComplaint),
+  }
+}
+
 // GET /api/complaints/:id
 export async function fetchAdminComplaint(id, signal) {
   const data = await apiRequest(`/complaints/${encodeURIComponent(id)}`, { signal })
