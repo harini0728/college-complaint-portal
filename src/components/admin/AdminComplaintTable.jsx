@@ -32,7 +32,9 @@ export default function AdminComplaintTable({ complaints, from }) {
             </th>
             <td data-label="Student">
               {complaint.submittedBy.name}
-              <span className="admin-table__sub">{complaint.submittedBy.id}</span>
+              <span className="admin-table__sub">
+                {complaint.submittedBy.email || complaint.submittedBy.id}
+              </span>
             </td>
             <td data-label="Category">{complaint.category}</td>
             <td data-label="Location">{complaint.location}</td>

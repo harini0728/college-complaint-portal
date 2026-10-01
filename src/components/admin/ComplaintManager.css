@@ -44,6 +44,12 @@
   border-color: var(--status-resolved-dot);
 }
 
+.manager__feedback--error {
+  color: var(--status-rejected-fg);
+  background: var(--status-rejected-bg);
+  border-color: var(--status-rejected-dot);
+}
+
 .manager__feedback--info {
   color: var(--status-in-progress-fg);
   background: var(--status-in-progress-bg);

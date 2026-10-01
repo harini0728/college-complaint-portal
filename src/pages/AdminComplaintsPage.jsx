@@ -5,18 +5,22 @@ import EmptyState from '../components/EmptyState'
 import Button from '../components/ui/Button'
 import TextField from '../components/ui/TextField'
 import SelectField from '../components/ui/SelectField'
+import ErrorState from '../components/ErrorState'
 import { ComplaintListSkeleton } from '../components/ComplaintList'
 import AdminComplaintTable from '../components/admin/AdminComplaintTable'
 import { useAllComplaints } from '../hooks/useAllComplaints'
+import { useDebouncedValue } from '../hooks/useDebouncedValue'
 import { COMPLAINT_CATEGORIES } from '../constants/categories'
 import { STATUS_LIST } from '../constants/statuses'
-import { filterAdminComplaints, sortComplaints } from '../utils/complaints'
 import './AdminComplaintsPage.css'
 
 const SORT_OPTIONS = [
   { value: 'newest', label: 'Newest first' },
   { value: 'oldest', label: 'Oldest first' },
 ]
+
+// The backend accepts a search of up to 100 characters.
+const SEARCH_MAX_LENGTH = 100
 
 // Only accept a URL value that really is one of the options.
 const pick = (value, options) => (options.includes(value) ? value : '')
@@ -25,12 +29,14 @@ const pick = (value, options) => (options.includes(value) ? value : '')
 // Rejected pages. Give it `status` to lock the list to one status.
 // The search and filters live in the URL (?q=fan&category=Hostel), so going to a
 // complaint and coming back keeps them.
+// The complaints come from the backend: status, search and sort are applied by
+// the server (newest first by default). The category filter has no backend
+// support, so it narrows down the results that come back.
 export default function AdminComplaintsPage({
   status: lockedStatus,
   title = 'All complaints',
   description = 'Search, filter and open any complaint.',
 }) {
-  const { complaints, loading } = useAllComplaints()
   const [params, setParams] = useSearchParams()
   const location = useLocation()
 
@@ -38,6 +44,16 @@ export default function AdminComplaintsPage({
   const category = pick(params.get('category'), COMPLAINT_CATEGORIES)
   const status = lockedStatus ?? pick(params.get('status'), STATUS_LIST)
   const sort = params.get('sort') === 'oldest' ? 'oldest' : 'newest'
+
+  // The input updates at once; the server is asked after a short pause in typing.
+  const search = useDebouncedValue(query.trim().slice(0, SEARCH_MAX_LENGTH), 300)
+  const {
+    complaints: inScope,
+    loading,
+    refreshing,
+    error,
+    reload,
+  } = useAllComplaints({ status, search, sort })
 
   const setParam = (key, value) =>
     setParams(
@@ -60,25 +76,29 @@ export default function AdminComplaintsPage({
       { replace: true },
     )
 
-  const inScope = lockedStatus
-    ? complaints.filter((complaint) => complaint.status === lockedStatus)
-    : complaints
-  const filtered = sortComplaints(
-    filterAdminComplaints(complaints, { query, category, status }),
-    sort,
-  )
+  const filtered = category
+    ? inScope.filter((complaint) => complaint.category === category)
+    : inScope
   const hasFilters = query.trim() !== '' || category !== '' || (!lockedStatus && status !== '')
-  const noun = inScope.length === 1 ? 'complaint' : 'complaints'
-  const summary = hasFilters
-    ? `Showing ${filtered.length} of ${inScope.length} ${noun}`
-    : `${inScope.length} ${noun}`
+  const noun = filtered.length === 1 ? 'complaint' : 'complaints'
+  const summary = loading
+    ? 'Loading complaints…'
+    : refreshing
+      ? 'Updating results…'
+      : category && filtered.length !== inScope.length
+      ? `Showing ${filtered.length} of ${inScope.length} ${noun}`
+      : `${filtered.length} ${noun}`
+  // Keep the search and filters on screen once there is something to filter, and
+  // also while filters are active, so a search with no results can be cleared.
+  // (While filters are active they never disappear, so typing is not interrupted.)
+  const showControls = hasFilters || (!loading && inScope.length > 0)
 
   return (
     <>
       <PageHeader title={title} description={description} />
 
       <Panel title={lockedStatus ? `${lockedStatus} complaints` : 'All complaints'}>
-        {!loading && inScope.length > 0 && (
+        {showControls && (
           <>
             <div className="admin-filters">
               <div className="admin-filters__search">
@@ -86,10 +106,11 @@ export default function AdminComplaintsPage({
                   type="search"
                   label="Search"
                   name="search"
-                  placeholder="Complaint ID, title or student"
+                  placeholder="Title, description, category or location"
                   value={query}
                   onChange={(event) => setParam('q', event.target.value)}
                   autoComplete="off"
+                  maxLength={SEARCH_MAX_LENGTH}
                 />
               </div>
               <div className="admin-filters__select">
@@ -138,7 +159,15 @@ export default function AdminComplaintsPage({
 
         {loading && <ComplaintListSkeleton rows={5} />}
 
-        {!loading && inScope.length === 0 && (
+        {!loading && error && (
+          <ErrorState
+            title="We could not load the complaints"
+            message={error.message}
+            onRetry={reload}
+          />
+        )}
+
+        {!loading && !error && filtered.length === 0 && !hasFilters && (
           <EmptyState
             title={
               lockedStatus
@@ -153,7 +182,7 @@ export default function AdminComplaintsPage({
           />
         )}
 
-        {!loading && inScope.length > 0 && filtered.length === 0 && (
+        {!loading && !error && filtered.length === 0 && hasFilters && (
           <EmptyState
             title="No complaints match your filters"
             message="Try a different search word, or choose another category or status."
@@ -165,11 +194,16 @@ export default function AdminComplaintsPage({
           />
         )}
 
-        {!loading && filtered.length > 0 && (
-          <AdminComplaintTable
-            complaints={filtered}
-            from={`${location.pathname}${location.search}`}
-          />
+        {!loading && !error && filtered.length > 0 && (
+          <div
+            className={refreshing ? 'admin-results admin-results--refreshing' : 'admin-results'}
+            aria-busy={refreshing}
+          >
+            <AdminComplaintTable
+              complaints={filtered}
+              from={`${location.pathname}${location.search}`}
+            />
+          </div>
         )}
       </Panel>
     </>

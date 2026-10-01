@@ -18,7 +18,7 @@ export default function ComplaintList({ complaints, getLink, showStudent = false
                 <span className="complaint-item__id">{complaint.id}</span>
                 {showStudent && (
                   <span>
-                    {complaint.submittedBy.name} ({complaint.submittedBy.id})
+                    {complaint.submittedBy.name} ({complaint.submittedBy.email || complaint.submittedBy.id})
                   </span>
                 )}
                 <span>{complaint.category}</span>

@@ -6,10 +6,9 @@ import { COMPLAINT_STATUSES as STATUS, STATUS_LIST } from '../../constants/statu
 import { ADMIN_RESPONSE_MAX, validateAdminUpdate } from '../../utils/validation'
 import './ComplaintManager.css'
 
-const FAKE_NETWORK_DELAY_MS = 600
-
 // The admin's form: change the status and write a response for the student.
-//   onSave(id, { status, adminResponse }) updates the shared complaint state.
+//   onSave({ status?, adminResponse? }) sends only what changed to the backend
+//   (PATCH /api/complaints/:id) and rejects with an Error if it fails.
 // The response box starts empty. A new response replaces the previous one;
 // leaving it empty keeps the previous one.
 export default function ComplaintManager({ complaint, onSave }) {
@@ -18,7 +17,7 @@ export default function ComplaintManager({ complaint, onSave }) {
   const [touched, setTouched] = useState(false)
   const [attempted, setAttempted] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
-  const [feedback, setFeedback] = useState(null) // { type: 'success' | 'info', text }
+  const [feedback, setFeedback] = useState(null) // { type: 'success' | 'info' | 'error', text }
 
   const responseRef = useRef(null)
 
@@ -57,18 +56,29 @@ export default function ComplaintManager({ complaint, onSave }) {
       return
     }
 
-    setIsSaving(true)
-    await new Promise((resolve) => setTimeout(resolve, FAKE_NETWORK_DELAY_MS))
+    // Send only what changed.
+    const changes = {}
+    if (statusChanged) changes.status = status
+    if (hasNewResponse) changes.adminResponse = response.trim()
 
-    onSave(complaint.id, {
-      status,
-      adminResponse: hasNewResponse ? response.trim() : complaint.adminResponse,
-    })
-
+    // Written now, from what the admin saw when pressing Save.
     const parts = []
     if (statusChanged) parts.push(`Status changed from ${complaint.status} to ${status}.`)
     if (hasNewResponse) parts.push('Your response was saved.')
     parts.push('The student can now see the update.')
+
+    setIsSaving(true)
+    try {
+      await onSave(changes)
+    } catch (error) {
+      // Nothing is cleared, so the admin can fix the problem and press Save again.
+      setIsSaving(false)
+      setFeedback({
+        type: 'error',
+        text: error?.message || 'The changes could not be saved. Please try again.',
+      })
+      return
+    }
 
     setIsSaving(false)
     setResponse('')

@@ -35,3 +35,9 @@
     padding: var(--space-3) var(--space-4);
   }
 }
+
+/* Old results stay visible, slightly faded, while a new search loads. */
+.admin-results--refreshing {
+  opacity: 0.55;
+  transition: opacity 0.15s;
+}

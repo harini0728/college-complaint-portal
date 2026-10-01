@@ -14,7 +14,7 @@ export default function ComplaintOverview({
   showStatusDescription = true,
 }) {
   const { attachment, submittedBy } = complaint
-  const isImage = attachment?.type.startsWith('image/')
+  const isImage = attachment?.type?.startsWith('image/')
 
   return (
     <div className="overview">
@@ -32,8 +32,13 @@ export default function ComplaintOverview({
             columns={3}
             items={[
               { label: 'Student', value: submittedBy.name },
-              { label: 'Student ID', value: submittedBy.id },
-              { label: 'Department', value: submittedBy.department },
+              // Real accounts have an email; the old sample data had a student ID.
+              submittedBy.email
+                ? { label: 'Email', value: submittedBy.email }
+                : { label: 'Student ID', value: submittedBy.id },
+              ...(submittedBy.department
+                ? [{ label: 'Department', value: submittedBy.department }]
+                : []),
             ]}
           />
         </div>
@@ -71,7 +76,8 @@ export default function ComplaintOverview({
                 {attachment.name}
               </a>{' '}
               <span className="overview__muted">
-                ({formatFileSize(attachment.size)}, opens in a new tab)
+                ({typeof attachment.size === 'number' ? `${formatFileSize(attachment.size)}, ` : ''}
+                opens in a new tab)
               </span>
             </p>
           </div>

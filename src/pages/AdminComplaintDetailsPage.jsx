@@ -5,10 +5,10 @@ import EmptyState from '../components/EmptyState'
 import Button from '../components/ui/Button'
 import ComplaintOverview from '../components/ComplaintOverview'
 import StatusTimeline from '../components/StatusTimeline'
+import ErrorState from '../components/ErrorState'
 import { ComplaintListSkeleton } from '../components/ComplaintList'
 import ComplaintManager from '../components/admin/ComplaintManager'
-import { useComplaints } from '../context/useComplaints'
-import { useAllComplaints } from '../hooks/useAllComplaints'
+import { useAdminComplaint } from '../hooks/useAdminComplaint'
 import { ROUTES } from '../constants/routes'
 import { formatDate } from '../utils/complaints'
 import './AdminComplaintDetailsPage.css'
@@ -16,8 +16,7 @@ import './AdminComplaintDetailsPage.css'
 export default function AdminComplaintDetailsPage() {
   const { id } = useParams()
   const { state } = useLocation()
-  const { updateComplaint } = useComplaints()
-  const { complaints, loading } = useAllComplaints()
+  const { complaint, loading, error, notFound, reload, save } = useAdminComplaint(id)
 
   // Go back to the list the admin came from, with its filters.
   const backButton = (
@@ -37,16 +36,29 @@ export default function AdminComplaintDetailsPage() {
     )
   }
 
-  const complaint = complaints.find((item) => item.id === id)
+  if (error) {
+    return (
+      <>
+        <PageHeader title="Complaint details" action={backButton} />
+        <Panel title="Complaint">
+          <ErrorState
+            title="We could not load this complaint"
+            message={error.message}
+            onRetry={reload}
+          />
+        </Panel>
+      </>
+    )
+  }
 
-  if (!complaint) {
+  if (notFound || !complaint) {
     return (
       <>
         <PageHeader title="Complaint details" action={backButton} />
         <Panel title="Complaint not found">
           <EmptyState
             title="We could not find this complaint"
-            message={`There is no complaint with the reference ${id}. Check the number, or open the complaint from the list.`}
+            message={`There is no complaint with the reference ${id}. Check the reference, or open the complaint from the list.`}
             action={<Button to={ROUTES.ADMIN_COMPLAINTS}>Go to all complaints</Button>}
           />
         </Panel>
@@ -72,7 +84,7 @@ export default function AdminComplaintDetailsPage() {
 
           <Panel title="Manage complaint">
             <div className="panel-body">
-              <ComplaintManager complaint={complaint} onSave={updateComplaint} />
+              <ComplaintManager complaint={complaint} onSave={save} />
             </div>
           </Panel>
         </div>

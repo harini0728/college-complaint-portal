@@ -3,6 +3,7 @@ import PageHeader from '../components/PageHeader'
 import Panel from '../components/Panel'
 import StatCard from '../components/StatCard'
 import EmptyState from '../components/EmptyState'
+import ErrorState from '../components/ErrorState'
 import Button from '../components/ui/Button'
 import ComplaintList, { ComplaintListSkeleton } from '../components/ComplaintList'
 import { StatusBreakdown, CategoryBreakdown } from '../components/admin/AdminCharts'
@@ -17,7 +18,7 @@ const RECENT_COUNT = 5
 
 export default function AdminDashboardPage() {
   const { user } = useAuth()
-  const { complaints, loading } = useAllComplaints()
+  const { complaints, loading, error, reload } = useAllComplaints()
 
   const counts = countByStatus(complaints)
   const recent = sortComplaints(complaints, 'newest').slice(0, RECENT_COUNT)
@@ -27,10 +28,22 @@ export default function AdminDashboardPage() {
       <PageHeader
         title={`Welcome, ${user.name}`}
         tabTitle="Admin dashboard"
-        description={`${user.department}. Here is where all complaints stand today.`}
+        description={`${user.department ? `${user.department}. ` : ''}Here is where all complaints stand today.`}
         action={<Button to={ROUTES.ADMIN_COMPLAINTS}>View all complaints</Button>}
       />
 
+      {error && (
+        <Panel title="Complaints">
+          <ErrorState
+            title="We could not load the complaints"
+            message={error.message}
+            onRetry={reload}
+          />
+        </Panel>
+      )}
+
+      {!error && (
+      <>
       <dl className="stats admin-stats" aria-busy={loading}>
         <StatCard label="Total complaints" value={counts.total} loading={loading} />
         <StatCard label={STATUS.PENDING} status={STATUS.PENDING} value={counts.pending} loading={loading} />
@@ -83,6 +96,8 @@ export default function AdminDashboardPage() {
           </Panel>
         </div>
       </div>
+      </>
+      )}
     </>
   )
 }
