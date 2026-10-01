@@ -15,7 +15,7 @@ export default function DemoCredentials({ onFill }) {
             <div>
               <strong>{ROLE_LABELS[account.role]}</strong>
               <div className="demo__creds">
-                {account.id} or {account.email}
+                {account.email}
                 <br />
                 Password: {account.password}
               </div>

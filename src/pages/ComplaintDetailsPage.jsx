@@ -4,9 +4,9 @@ import Panel from '../components/Panel'
 import EmptyState from '../components/EmptyState'
 import ComplaintOverview from '../components/ComplaintOverview'
 import StatusTimeline from '../components/StatusTimeline'
+import ErrorState from '../components/ErrorState'
 import Button from '../components/ui/Button'
-import { useAuth } from '../context/useAuth'
-import { useStudentComplaints } from '../hooks/useStudentComplaints'
+import { useStudentComplaint } from '../hooks/useStudentComplaint'
 import { COMPLAINT_STATUSES as STATUS } from '../constants/statuses'
 import { ROUTES } from '../constants/routes'
 import { formatDate } from '../utils/complaints'
@@ -21,8 +21,7 @@ const BACK_BUTTON = (
 export default function ComplaintDetailsPage() {
   const { id } = useParams()
   const { state } = useLocation()
-  const { user } = useAuth()
-  const { complaints, loading } = useStudentComplaints(user.id)
+  const { complaint, loading, error, notFound, reload } = useStudentComplaint(id)
 
   if (loading) {
     return (
@@ -38,17 +37,31 @@ export default function ComplaintDetailsPage() {
     )
   }
 
-  // Only the student's own complaints are searched, so someone else's ID also lands here.
-  const complaint = complaints.find((item) => item.id === id)
+  // The server could not be reached, or failed: say so and let the student retry.
+  if (error) {
+    return (
+      <>
+        <PageHeader title="Complaint details" action={BACK_BUTTON} />
+        <Panel title="Complaint">
+          <ErrorState
+            title="We could not load this complaint"
+            message={error.message}
+            onRetry={reload}
+          />
+        </Panel>
+      </>
+    )
+  }
 
-  if (!complaint) {
+  // The backend only returns the student's own complaints, so someone else's ID also lands here.
+  if (notFound || !complaint) {
     return (
       <>
         <PageHeader title="Complaint details" action={BACK_BUTTON} />
         <Panel title="Complaint not found">
           <EmptyState
             title="We could not find this complaint"
-            message={`There is no complaint with the reference ${id} in your account. Check the number, or open the complaint from your list.`}
+            message={`There is no complaint with the reference ${id} in your account. Check the reference, or open the complaint from your list.`}
             action={<Button to={ROUTES.STUDENT_COMPLAINTS}>Go to my complaints</Button>}
           />
         </Panel>

@@ -82,6 +82,14 @@ export async function fetchAdminComplaint(id, signal) {
   return mapAdminComplaint(data.complaint)
 }
 
+// GET /api/complaints/:id as a student.
+// Same endpoint as above; the backend only returns the complaint when it belongs
+// to the signed-in student, and answers 404 for anyone else's.
+export async function fetchStudentComplaint(id, signal) {
+  const data = await apiRequest(`/complaints/${encodeURIComponent(id)}`, { signal })
+  return mapAdminComplaint(data.complaint)
+}
+
 // PATCH /api/complaints/:id   changes: { status?, adminResponse? }
 export async function patchComplaint(id, changes) {
   const data = await apiRequest(`/complaints/${encodeURIComponent(id)}`, {

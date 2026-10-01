@@ -52,7 +52,7 @@ export default function LoginPage() {
 
   const handleFillDemo = (account) => {
     setRole(account.role)
-    setIdentifier(account.id)
+    setIdentifier(account.email)
     setPassword(account.password)
     setFormError('')
   }
@@ -82,7 +82,7 @@ export default function LoginPage() {
   }
 
   const identifierLabel =
-    role === ROLES.ADMIN ? 'Staff ID or email' : 'Student ID or email'
+    role === ROLES.ADMIN ? 'Staff email' : 'Student email'
 
   return (
     <AuthLayout>
@@ -90,7 +90,7 @@ export default function LoginPage() {
         <div className="login__header">
           <h1 className="login__title">Sign in</h1>
           <p className="login__subtitle">
-            Use your college ID or email to continue.
+            Use your college email to continue.
           </p>
         </div>
 
