@@ -1,4 +1,5 @@
 import { useLocation, useParams } from 'react-router-dom'
+import { ArrowLeft } from 'lucide-react'
 import PageHeader from '../components/PageHeader'
 import Panel from '../components/Panel'
 import EmptyState from '../components/EmptyState'
@@ -21,6 +22,7 @@ export default function AdminComplaintDetailsPage() {
   // Go back to the list the admin came from, with its filters.
   const backButton = (
     <Button variant="secondary" to={state?.from ?? ROUTES.ADMIN_COMPLAINTS}>
+      <ArrowLeft className="icon" size={16} aria-hidden="true" />
       Back to complaints
     </Button>
   )

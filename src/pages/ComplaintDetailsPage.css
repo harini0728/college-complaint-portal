@@ -14,12 +14,12 @@
 /* Wide screens: timeline sits beside the details. */
 @media (min-width: 1280px) {
   .details {
-    grid-template-columns: minmax(0, 1fr) 20rem;
+    grid-template-columns: minmax(0, 1fr) 21rem;
   }
 
   .details__aside {
     position: sticky;
-    top: var(--space-5);
+    top: calc(var(--topbar-height) + var(--space-5));
   }
 }
 
@@ -29,6 +29,7 @@
 }
 
 .details__response {
+  line-height: 1.65;
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
@@ -38,16 +39,25 @@
 }
 
 .details__success {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
   margin-bottom: var(--space-5);
   padding: var(--space-3) var(--space-4);
+  font-size: var(--text-sm);
   color: var(--status-resolved-fg);
   background: var(--status-resolved-bg);
-  border: 1px solid var(--status-resolved-dot);
-  border-radius: var(--radius-sm);
+  border: 1px solid #bbf7d0;
+  border-radius: var(--radius-md);
+}
+
+.details__success .icon {
+  margin-top: 2px;
 }
 
 .details__success a {
   color: inherit;
+  font-weight: 600;
 }
 
 /* Loading placeholders */
@@ -58,6 +68,7 @@
   background: var(--color-paper);
   border: 1px solid var(--color-line);
   border-radius: var(--radius-md);
+  box-shadow: var(--shadow-sm);
 }
 
 .details__skeleton-title {

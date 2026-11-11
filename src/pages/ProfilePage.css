@@ -1,7 +1,7 @@
 .profile {
   display: grid;
   gap: var(--space-5);
-  max-width: 46rem;
+  max-width: 48rem;
 }
 
 .profile .panel-body {
@@ -9,9 +9,50 @@
   gap: var(--space-4);
 }
 
+.profile__hero {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  color: #fff;
+  background:
+    radial-gradient(30rem 12rem at 100% 0%, rgba(59, 130, 246, 0.5), transparent 60%),
+    linear-gradient(135deg, var(--navy-900), var(--navy-800));
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-md);
+}
+
+.profile__avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 4rem;
+  height: 4rem;
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: var(--blue-700);
+  background: #fff;
+  border-radius: 50%;
+}
+
+.profile__name {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  color: #fff;
+  overflow-wrap: anywhere;
+}
+
+.profile__meta {
+  font-size: var(--text-sm);
+  color: var(--slate-300);
+  overflow-wrap: anywhere;
+}
+
 .profile__note {
+  padding-top: var(--space-4);
   font-size: var(--text-sm);
   color: var(--color-muted);
+  border-top: 1px solid var(--color-line);
 }
 
 /* The cards sit inside a panel already, so no extra space below them. */

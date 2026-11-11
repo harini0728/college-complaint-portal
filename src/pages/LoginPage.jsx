@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { Navigate } from 'react-router-dom'
+import { AlertCircle, Eye, EyeOff } from 'lucide-react'
 import AuthLayout from '../layouts/AuthLayout'
 import Button from '../components/ui/Button'
 import TextField from '../components/ui/TextField'
@@ -88,16 +89,17 @@ export default function LoginPage() {
     <AuthLayout>
       <div className="login">
         <div className="login__header">
-          <h1 className="login__title">Sign in</h1>
+          <h1 className="login__title">Welcome back</h1>
           <p className="login__subtitle">
-            Use your college email to continue.
+            Sign in with your college email to continue.
           </p>
         </div>
 
         <form className="login__form" onSubmit={handleSubmit} noValidate>
           {formError && (
             <div className="login__alert" role="alert">
-              {formError}
+              <AlertCircle className="icon" size={18} aria-hidden="true" />
+              <span>{formError}</span>
             </div>
           )}
 
@@ -137,6 +139,11 @@ export default function LoginPage() {
                 aria-pressed={showPassword}
                 onClick={() => setShowPassword((shown) => !shown)}
               >
+                {showPassword ? (
+                  <EyeOff className="icon" size={16} aria-hidden="true" />
+                ) : (
+                  <Eye className="icon" size={16} aria-hidden="true" />
+                )}
                 {showPassword ? 'Hide' : 'Show'}
               </button>
             }

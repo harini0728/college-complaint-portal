@@ -1,15 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
+import { Menu } from 'lucide-react'
 import Sidebar from '../components/layout/Sidebar'
 import BrandMark from '../components/BrandMark'
 import { useAuth } from '../context/useAuth'
 import { NAV_BY_ROLE } from '../constants/navigation'
+import { ROLE_LABELS } from '../constants/roles'
+import { getInitials } from '../utils/complaints'
 import './DashboardLayout.css'
 
 const MENU_ID = 'app-menu'
 
-// Shell for every signed-in page: a slim icon rail on the left (with the ☰
-// button that expands it to show labels), a top bar and the content area.
+// Shell for every signed-in page: the navy sidebar (a drawer on tablets and
+// phones, opened with the menu button), a top bar and the content area.
 // Student and admin pages both use this; the menu items depend on the role.
 export default function DashboardLayout() {
   const { user, logout } = useAuth()
@@ -20,7 +23,7 @@ export default function DashboardLayout() {
 
   const closeMenu = () => setMenuOpen(false)
 
-  // Pressing Escape collapses the menu and returns focus to the ☰ button.
+  // Pressing Escape closes the drawer and returns focus to the menu button.
   useEffect(() => {
     if (!menuOpen) return undefined
     const handleKeyDown = (event) => {
@@ -52,13 +55,12 @@ export default function DashboardLayout() {
         items={NAV_BY_ROLE[user.role]}
         user={user}
         open={menuOpen}
-        onToggle={() => setMenuOpen((isOpen) => !isOpen)}
+        onClose={closeMenu}
         onNavigate={closeMenu}
         onLogout={logout}
-        toggleRef={menuButtonRef}
       />
 
-      {/* Dims the page behind the expanded menu. Click it to collapse. */}
+      {/* Dims the page behind the open drawer. Click it to close. */}
       <div
         className={`shell__backdrop${menuOpen ? ' shell__backdrop--visible' : ''}`}
         onClick={closeMenu}
@@ -66,7 +68,31 @@ export default function DashboardLayout() {
       />
 
       <header className="shell__topbar">
-        <BrandMark inverse />
+        <button
+          type="button"
+          ref={menuButtonRef}
+          className="shell__menu-button"
+          aria-label="Open menu"
+          aria-expanded={menuOpen}
+          aria-controls={MENU_ID}
+          onClick={() => setMenuOpen((isOpen) => !isOpen)}
+        >
+          <Menu className="icon" size={22} aria-hidden="true" />
+        </button>
+
+        <div className="shell__brand">
+          <BrandMark />
+        </div>
+
+        <div className="shell__user">
+          <div className="shell__user-text">
+            <span className="shell__user-name">{user.name}</span>
+            <span className="shell__user-role">{ROLE_LABELS[user.role]}</span>
+          </div>
+          <span className="avatar" aria-hidden="true">
+            {getInitials(user.name)}
+          </span>
+        </div>
       </header>
 
       <main className="shell__main" id="main-content" ref={mainRef} tabIndex={-1}>

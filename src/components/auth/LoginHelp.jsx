@@ -1,4 +1,5 @@
 import { useId, useState } from 'react'
+import { HelpCircle } from 'lucide-react'
 import { COLLEGE } from '../../constants/college'
 import './LoginHelp.css'
 
@@ -16,6 +17,7 @@ export default function LoginHelp() {
         aria-controls={panelId}
         onClick={() => setOpen((isOpen) => !isOpen)}
       >
+        <HelpCircle className="icon" size={16} aria-hidden="true" />
         Need help signing in?
       </button>
 

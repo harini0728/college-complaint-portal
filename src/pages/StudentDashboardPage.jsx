@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { Plus } from 'lucide-react'
 import PageHeader from '../components/PageHeader'
 import Panel from '../components/Panel'
 import StatCard from '../components/StatCard'
@@ -27,7 +28,12 @@ export default function StudentDashboardPage() {
         title={`Welcome back, ${firstName}`}
         tabTitle="Dashboard"
         description="Here is where your complaints stand today."
-        action={<Button to={ROUTES.STUDENT_SUBMIT}>Submit a complaint</Button>}
+        action={
+          <Button to={ROUTES.STUDENT_SUBMIT}>
+            <Plus className="icon" size={16} aria-hidden="true" />
+            Submit a complaint
+          </Button>
+        }
       />
 
       <dl className="stats" aria-busy={loading}>

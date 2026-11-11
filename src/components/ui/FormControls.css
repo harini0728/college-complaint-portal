@@ -5,7 +5,7 @@
 .field__select {
   appearance: none;
   padding-right: 2.5rem;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23566370' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right var(--space-3) center;
   background-size: 0.75rem;
@@ -52,25 +52,29 @@
   flex: 1;
   min-width: 0;
   padding: var(--space-2) var(--space-3);
+  color: var(--color-muted);
+  background: var(--slate-50);
+  border-style: dashed;
+  border-width: 1.5px;
   cursor: pointer;
 }
 
 .field__file::file-selector-button {
-  min-height: 32px;
+  min-height: 2rem;
   margin-right: var(--space-3);
   padding: 0 var(--space-3);
   font: inherit;
   font-size: var(--text-sm);
   font-weight: 600;
-  color: var(--color-primary);
-  background: var(--color-primary-soft);
-  border: 0;
+  color: var(--blue-700);
+  background: var(--blue-50);
+  border: 1px solid var(--blue-100);
   border-radius: var(--radius-sm);
   cursor: pointer;
 }
 
 .field__file-remove {
-  min-height: 44px;
+  min-height: 2.75rem;
   padding: 0 var(--space-3);
   font: inherit;
   font-size: var(--text-sm);

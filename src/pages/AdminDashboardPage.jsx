@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { ArrowRight } from 'lucide-react'
 import PageHeader from '../components/PageHeader'
 import Panel from '../components/Panel'
 import StatCard from '../components/StatCard'
@@ -24,7 +25,12 @@ export default function AdminDashboardPage() {
         title={`Welcome, ${user.name}`}
         tabTitle="Admin dashboard"
         description={`${user.department ? `${user.department}. ` : ''}Here is where all complaints stand today.`}
-        action={<Button to={ROUTES.ADMIN_COMPLAINTS}>View all complaints</Button>}
+        action={(
+          <Button to={ROUTES.ADMIN_COMPLAINTS}>
+            View all complaints
+            <ArrowRight className="icon" size={16} aria-hidden="true" />
+          </Button>
+        )}
       />
 
       {error && (

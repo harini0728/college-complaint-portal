@@ -1,4 +1,5 @@
 import { Link, useLocation, useParams } from 'react-router-dom'
+import { ArrowLeft, CheckCircle2 } from 'lucide-react'
 import PageHeader from '../components/PageHeader'
 import Panel from '../components/Panel'
 import EmptyState from '../components/EmptyState'
@@ -14,6 +15,7 @@ import './ComplaintDetailsPage.css'
 
 const BACK_BUTTON = (
   <Button variant="secondary" to={ROUTES.STUDENT_COMPLAINTS}>
+    <ArrowLeft className="icon" size={16} aria-hidden="true" />
     Back to my complaints
   </Button>
 )
@@ -81,9 +83,12 @@ export default function ComplaintDetailsPage() {
 
       {state?.justSubmitted && (
         <div className="details__success" role="status">
-          <strong>Your complaint has been submitted.</strong> Your reference number is{' '}
-          {complaint.id}. You can follow its progress on this page or in{' '}
-          <Link to={ROUTES.STUDENT_COMPLAINTS}>My complaints</Link>.
+          <CheckCircle2 className="icon" size={18} aria-hidden="true" />
+          <p>
+            <strong>Your complaint has been submitted.</strong> Your reference number is{' '}
+            {complaint.id}. You can follow its progress on this page or in{' '}
+            <Link to={ROUTES.STUDENT_COMPLAINTS}>My complaints</Link>.
+          </p>
         </div>
       )}
 

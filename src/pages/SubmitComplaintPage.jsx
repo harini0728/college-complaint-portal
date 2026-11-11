@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { AlertCircle, Send } from 'lucide-react'
 import PageHeader from '../components/PageHeader'
 import Panel from '../components/Panel'
 import Button from '../components/ui/Button'
@@ -108,9 +109,12 @@ export default function SubmitComplaintPage() {
           <form className="submit__form panel-body" onSubmit={handleSubmit} noValidate>
             {attempted && errorCount > 0 && (
               <div className="submit__alert" role="alert">
-                {errorCount === 1
-                  ? 'One field needs your attention. Fix it and submit again.'
-                  : `${errorCount} fields need your attention. Fix them and submit again.`}
+                <AlertCircle className="icon" size={18} aria-hidden="true" />
+                <span>
+                  {errorCount === 1
+                    ? 'One field needs your attention. Fix it and submit again.'
+                    : `${errorCount} fields need your attention. Fix them and submit again.`}
+                </span>
               </div>
             )}
 
@@ -186,6 +190,7 @@ export default function SubmitComplaintPage() {
                 loading={isSubmitting}
                 loadingText="Submitting…"
               >
+                <Send className="icon" size={16} aria-hidden="true" />
                 Submit complaint
               </Button>
               <Button variant="secondary" to={ROUTES.STUDENT_COMPLAINTS}>

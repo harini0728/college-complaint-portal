@@ -4,7 +4,7 @@
   list-style: none;
 }
 
-.complaint-list > li + li {
+.complaint-list li + li {
   border-top: 1px solid var(--color-line);
 }
 
@@ -12,66 +12,90 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--space-4);
+  gap: var(--space-3) var(--space-4);
   padding: var(--space-4) var(--space-5);
   color: inherit;
   text-decoration: none;
+  transition: background-color 0.15s ease;
 }
 
 a.complaint-item:hover {
-  background: var(--color-page);
+  color: inherit;
+  background: var(--slate-50);
+}
+
+a.complaint-item:focus-visible {
+  outline-offset: -2px;
 }
 
 .complaint-item__main {
   display: grid;
-  gap: var(--space-1);
+  gap: 0.25rem;
   min-width: 0;
 }
 
 .complaint-item__title {
   font-weight: 600;
+  overflow-wrap: anywhere;
 }
 
-.complaint-item:hover .complaint-item__title {
-  text-decoration: underline;
-  text-underline-offset: 3px;
+a.complaint-item:hover .complaint-item__title {
+  color: var(--color-primary);
 }
 
 .complaint-item__meta {
   display: flex;
   flex-wrap: wrap;
-  gap: 0 var(--space-4);
-  font-size: var(--text-sm);
+  gap: 0 var(--space-3);
+  font-size: var(--text-xs);
   color: var(--color-muted);
 }
 
 .complaint-item__id {
-  font-weight: 500;
-  color: var(--color-ink);
+  font-weight: 600;
+  color: var(--slate-700);
 }
 
-/* Loading placeholders */
+.complaint-item__chevron {
+  flex: none;
+  color: var(--slate-400);
+}
+
+.complaint-item__end {
+  display: flex;
+  align-items: center;
+  flex: none;
+  gap: var(--space-3);
+}
+
 .complaint-item--skeleton {
   display: grid;
   gap: var(--space-2);
-  justify-content: stretch;
 }
 
 .complaint-item__skeleton-title {
-  width: min(22rem, 70%);
+  width: 55%;
   height: 1.1rem;
 }
 
 .complaint-item__skeleton-meta {
-  width: min(14rem, 45%);
-  height: 0.85rem;
+  width: 35%;
+  height: 0.8rem;
 }
 
 @media (max-width: 599px) {
   .complaint-item {
     flex-direction: column;
     align-items: flex-start;
-    gap: var(--space-3);
     padding: var(--space-4);
+  }
+
+  .complaint-item__end {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .complaint-item__chevron {
+    display: none;
   }
 }
