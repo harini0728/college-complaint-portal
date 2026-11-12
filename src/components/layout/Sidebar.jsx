@@ -14,7 +14,7 @@ import {
 } from 'lucide-react'
 import BrandMark from '../BrandMark'
 import { ROLE_LABELS } from '../../constants/roles'
-import { ROUTES } from '../../constants/routes'
+import { ROUTES, getProfilePath } from '../../constants/routes'
 import { getInitials } from '../../utils/complaints'
 import './Sidebar.css'
 
@@ -82,7 +82,12 @@ export default function Sidebar({
       </nav>
 
       <div className="sidebar__footer">
-        <div className="sidebar__user">
+        <NavLink
+          to={getProfilePath(user.role)}
+          className="sidebar__user"
+          aria-label={`${user.name}, open your profile`}
+          onClick={onNavigate}
+        >
           <span className="avatar avatar--on-dark" aria-hidden="true">
             {getInitials(user.name)}
           </span>
@@ -92,7 +97,7 @@ export default function Sidebar({
               {ROLE_LABELS[user.role]}, {user.id}
             </span>
           </div>
-        </div>
+        </NavLink>
         <button type="button" className="sidebar__link sidebar__logout" onClick={onLogout}>
           <LogOut className="icon sidebar__icon" size={19} aria-hidden="true" />
           <span className="sidebar__label">Logout</span>

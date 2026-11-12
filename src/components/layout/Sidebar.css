@@ -125,6 +125,21 @@
   gap: var(--space-3);
   min-width: 0;
   padding: var(--space-2) var(--space-3);
+  color: inherit;
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.sidebar__user:hover,
+.sidebar__user.active {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.sidebar__user:focus-visible {
+  outline-color: #fff;
+  outline-offset: -2px;
 }
 
 .sidebar__user-text {

@@ -29,6 +29,11 @@ export function adminComplaintPath(id) {
   return `${ROUTES.ADMIN_COMPLAINTS}/${id}`
 }
 
+// Each role's profile page (the avatar / name areas link here).
+export function getProfilePath(role) {
+  return role === ROLES.ADMIN ? ROUTES.ADMIN_PROFILE : ROUTES.STUDENT_PROFILE
+}
+
 // Where each role lands after signing in.
 export function getHomePath(role) {
   return role === ROLES.ADMIN ? ROUTES.ADMIN_DASHBOARD : ROUTES.STUDENT_DASHBOARD
