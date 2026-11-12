@@ -1,11 +1,12 @@
 .field {
   display: grid;
-  gap: var(--space-2);
+  gap: 0.375rem;
 }
 
 .field__label {
   font-size: var(--text-sm);
   font-weight: 600;
+  color: var(--slate-700);
 }
 
 .field__control {
@@ -14,13 +15,20 @@
 
 .field__input {
   width: 100%;
-  min-height: 44px;
+  min-height: 2.75rem;
   padding: 0 var(--space-3);
-  font: inherit; /* 16px: stops iOS from zooming in on focus */
+  font: inherit;
+  font-size: var(--text-base); /* stops iOS from zooming in on focus */
   color: var(--color-ink);
   background: var(--color-paper);
   border: 1px solid var(--color-line-strong);
   border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-xs);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.field__input::placeholder {
+  color: var(--slate-400);
 }
 
 .field__input--has-action {
@@ -28,12 +36,28 @@
 }
 
 .field__input:hover {
-  border-color: var(--color-muted);
+  border-color: var(--slate-400);
+}
+
+.field__input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+}
+
+.field__input:disabled {
+  color: var(--slate-500);
+  background: var(--slate-50);
+  cursor: not-allowed;
 }
 
 .field__input[aria-invalid='true'] {
   border-color: var(--color-danger);
   background: var(--color-danger-soft);
+}
+
+.field__input[aria-invalid='true']:focus {
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.18);
 }
 
 .field__action {
@@ -52,6 +76,7 @@
 }
 
 .field__error {
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
+  font-weight: 500;
   color: var(--color-danger);
 }

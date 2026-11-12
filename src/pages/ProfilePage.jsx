@@ -1,3 +1,4 @@
+import { BadgeCheck, Mail } from 'lucide-react'
 import PageHeader from '../components/PageHeader'
 import Panel from '../components/Panel'
 import DetailList from '../components/DetailList'
@@ -8,7 +9,7 @@ import { useAllComplaints } from '../hooks/useAllComplaints'
 import { COLLEGE } from '../constants/college'
 import { COMPLAINT_STATUSES as STATUS } from '../constants/statuses'
 import { ROLES, ROLE_LABELS } from '../constants/roles'
-import { countByStatus } from '../utils/complaints'
+import { countByStatus, getInitials } from '../utils/complaints'
 import './ProfilePage.css'
 
 // One profile page for both roles. The details are read-only for now:
@@ -25,6 +26,24 @@ export default function ProfilePage() {
       />
 
       <div className="profile">
+        <div className="profile__hero">
+          <span className="profile__avatar" aria-hidden="true">
+            {getInitials(user.name)}
+          </span>
+          <div>
+            <p className="profile__name">{user.name}</p>
+            <p className="profile__meta">
+              <BadgeCheck className="icon" size={14} aria-hidden="true" /> {ROLE_LABELS[user.role]}
+              {user.department ? ` · ${user.department}` : ''}
+            </p>
+            {user.email && (
+              <p className="profile__meta">
+                <Mail className="icon" size={14} aria-hidden="true" /> {user.email}
+              </p>
+            )}
+          </div>
+        </div>
+
         <Panel title="Account details">
           <div className="panel-body">
             <DetailList

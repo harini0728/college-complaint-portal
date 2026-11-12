@@ -1,5 +1,5 @@
 .submit {
-  max-width: 46rem;
+  max-width: 48rem;
 }
 
 .submit__form {
@@ -15,18 +15,27 @@
 }
 
 .submit__alert {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
   padding: var(--space-3) var(--space-4);
   font-size: var(--text-sm);
-  color: var(--color-danger);
+  color: var(--status-rejected-fg);
   background: var(--color-danger-soft);
-  border: 1px solid var(--color-danger);
+  border: 1px solid #fecaca;
   border-radius: var(--radius-sm);
+}
+
+.submit__alert .icon {
+  margin-top: 2px;
 }
 
 .submit__actions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-3);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--color-line);
 }
 
 @media (max-width: 599px) {

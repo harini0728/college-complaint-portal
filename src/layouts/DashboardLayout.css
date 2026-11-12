@@ -1,90 +1,162 @@
 .shell {
+  /* Width of the sidebar on desktop; the sidebar and the content area both read it. */
+  --sidebar-current: var(--sidebar-width);
   min-height: 100svh;
-  /* Room for the collapsed icon rail, so it never sits on top of the page.
-     The expanded menu overlays the page only while it is open. */
-  padding-left: var(--rail-width);
+  overflow-x: clip; /* never scroll sideways */
+  background: var(--color-page);
 }
 
-.shell__main {
-  padding: var(--space-6) clamp(1.5rem, 4vw, 3rem) var(--space-7);
+.shell--collapsed {
+  --sidebar-current: var(--sidebar-collapsed-width);
 }
 
-.shell__main:focus {
-  outline: none; /* focus is moved here by code, not by the person tabbing */
-}
-
-.shell__content {
-  max-width: 68rem;
-  margin: 0 auto;
-}
-
-/* Top bar (all screen sizes): sits to the right of the sidebar rail. It is
-   layered below the sidebar so it can never cover the ☰ button or the menu. */
-.shell__topbar {
-  position: relative;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  min-height: 4rem;
-  padding: 0 var(--space-4);
-  background: var(--color-primary);
-  color: var(--color-on-primary);
-}
-
-/* The open menu covers the left of the top bar, so fade the brand out of the
-   way (instead of leaving it half hidden behind the menu). */
-.shell__topbar .brand {
-  transition: opacity 0.2s ease;
-}
-
-.shell--menu-open .shell__topbar .brand {
-  opacity: 0;
-}
-
-/* The default focus ring is teal on teal here, so use white. */
-.shell__topbar :focus-visible {
-  outline-color: #ffffff;
-}
-
-/* Dims the page behind the open menu. Click it to close. */
 .shell__backdrop {
   position: fixed;
   inset: 0;
   z-index: 30;
-  background: rgba(22, 34, 46, 0.5);
+  background: rgba(15, 23, 42, 0.5);
+  backdrop-filter: blur(2px);
   opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.2s ease, visibility 0s linear 0.2s;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
 }
 
 .shell__backdrop--visible {
   opacity: 1;
-  visibility: visible;
-  transition-delay: 0s;
+  pointer-events: auto;
 }
 
-@media (max-width: 899px) {
+.shell__topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  height: var(--topbar-height);
+  padding: 0 var(--space-4);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: saturate(1.4) blur(8px);
+  border-bottom: 1px solid var(--color-line);
+}
+
+.shell__menu-button {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2.5rem;
+  height: 2.5rem;
+  color: var(--slate-700);
+  background: var(--color-paper);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.shell__menu-button:hover {
+  background: var(--slate-100);
+}
+
+.shell__brand {
+  min-width: 0;
+}
+
+.shell__brand .brand__name {
+  overflow: hidden;
+  font-size: var(--text-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.shell__user {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-left: auto;
+}
+
+.shell__user-text {
+  display: none;
+  text-align: right;
+  line-height: 1.25;
+}
+
+.shell__user-name {
+  display: block;
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+
+.shell__user-role {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+}
+
+.avatar {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2.25rem;
+  height: 2.25rem;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--blue-700);
+  background: var(--blue-100);
+  border-radius: 50%;
+}
+
+.avatar--on-dark {
+  color: #fff;
+  background: var(--color-primary);
+}
+
+.shell__main {
+  min-width: 0;
+}
+
+.shell__main:focus {
+  outline: none;
+}
+
+.shell__content {
+  width: 100%;
+  max-width: none; /* use the full area beside the sidebar */
+  padding: var(--space-5) var(--space-4) var(--space-7);
+}
+
+@media (min-width: 640px) {
   .shell__topbar {
-    min-height: 3.75rem;
+    padding: 0 var(--space-5);
   }
 
-  .shell__topbar .brand__name {
-    font-size: var(--text-base);
+  .shell__user-text {
+    display: block;
   }
 
-  .shell__topbar .brand__logo {
-    width: 1.75rem;
-    height: 1.75rem;
-  }
-
-  .shell__main {
-    padding: var(--space-5) var(--space-4) var(--space-6);
+  .shell__content {
+    padding: var(--space-6) var(--space-5) var(--space-7);
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .shell__topbar .brand,
+@media (min-width: 1024px) {
+  .shell__topbar,
+  .shell__main {
+    margin-left: var(--sidebar-current);
+    transition: margin-left 0.25s ease;
+  }
+
+  .shell__brand,
   .shell__backdrop {
-    transition: none;
+    display: none;
+  }
+
+  .shell__topbar {
+    padding: 0 var(--space-6);
+  }
+
+  .shell__content {
+    padding: var(--space-6);
   }
 }

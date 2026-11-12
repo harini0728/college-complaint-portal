@@ -1,4 +1,5 @@
 import { useLocation, useSearchParams } from 'react-router-dom'
+import { SearchX } from 'lucide-react'
 import PageHeader from '../components/PageHeader'
 import Panel from '../components/Panel'
 import EmptyState from '../components/EmptyState'
@@ -184,6 +185,7 @@ export default function AdminComplaintsPage({
 
         {!loading && !error && filtered.length === 0 && hasFilters && (
           <EmptyState
+            icon={SearchX}
             title="No complaints match your filters"
             message="Try a different search word, or choose another category or status."
             action={

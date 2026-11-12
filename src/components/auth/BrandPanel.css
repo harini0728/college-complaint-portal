@@ -1,74 +1,76 @@
 .brand-panel {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--space-7);
-  padding: var(--space-7) clamp(2rem, 5vw, 4.5rem);
-  background: var(--color-primary);
-  color: var(--color-on-primary);
+  gap: var(--space-5);
+  padding: var(--space-5) var(--space-4);
+  overflow: hidden;
+  color: #fff;
+  background:
+    radial-gradient(60rem 30rem at 100% 0%, rgba(37, 99, 235, 0.45), transparent 60%),
+    linear-gradient(160deg, var(--navy-900) 0%, var(--navy-950) 100%);
 }
 
 .brand-panel__body {
-  display: grid;
-  gap: var(--space-5);
-  max-width: 30rem;
+  display: none;
 }
 
 .brand-panel__headline {
-  font-family: var(--font-heading);
-  font-size: var(--text-2xl);
-  font-weight: 600;
-  line-height: 1.25;
+  max-width: 24rem;
+  font-size: 1.75rem;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
 }
 
 .brand-panel__intro {
-  color: #cfe3e9;
+  max-width: 26rem;
+  margin-top: var(--space-3);
+  font-size: var(--text-base);
+  color: var(--slate-300);
 }
 
-/* Vertical timeline: a line runs down the left with a dot at each step. */
 .lifecycle {
-  margin: 0;
+  display: grid;
+  gap: var(--space-3);
+  max-width: 28rem;
+  margin: var(--space-5) 0 0;
   padding: 0;
   list-style: none;
-  border-left: 2px solid rgba(255, 255, 255, 0.3);
 }
 
 .lifecycle__step {
-  position: relative;
   display: grid;
-  gap: var(--space-2);
   justify-items: start;
-  padding: 0 0 var(--space-5) var(--space-5);
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-4);
   font-size: var(--text-sm);
-  color: #e4f0f3;
-}
-
-.lifecycle__step:last-child {
-  padding-bottom: 0;
-}
-
-.lifecycle__step::before {
-  content: '';
-  position: absolute;
-  top: 0.55rem;
-  left: -7px;
-  width: 12px;
-  height: 12px;
-  background: var(--color-primary);
-  border: 2px solid #ffffff;
-  border-radius: 50%;
+  color: var(--slate-200);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(4px);
 }
 
 .brand-panel__note {
+  max-width: 28rem;
+  margin-top: var(--space-4);
   font-size: var(--text-sm);
-  color: #cfe3e9;
+  line-height: 1.9;
+  color: var(--slate-300);
 }
 
-/* On phones the panel shrinks to just the logo bar so the form stays above the fold. */
-@media (max-width: 899px) {
+/* On the dark panel the status badges keep their light fill so they stay legible. */
+
+@media (min-width: 1024px) {
   .brand-panel {
-    padding: var(--space-4) var(--space-5);
+    justify-content: space-between;
+    padding: var(--space-6);
   }
+
   .brand-panel__body {
-    display: none;
+    display: block;
+    margin-bottom: auto;
+    padding-top: var(--space-7);
   }
 }

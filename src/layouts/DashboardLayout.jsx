@@ -1,26 +1,79 @@
 import { useEffect, useRef, useState } from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
+import { Menu } from 'lucide-react'
 import Sidebar from '../components/layout/Sidebar'
 import BrandMark from '../components/BrandMark'
 import { useAuth } from '../context/useAuth'
 import { NAV_BY_ROLE } from '../constants/navigation'
+import { ROLE_LABELS } from '../constants/roles'
+import { getInitials } from '../utils/complaints'
 import './DashboardLayout.css'
 
 const MENU_ID = 'app-menu'
+const DESKTOP_QUERY = '(min-width: 1024px)'
 
-// Shell for every signed-in page: a slim icon rail on the left (with the ☰
-// button that expands it to show labels), a top bar and the content area.
+// Each role remembers its own sidebar choice (student and admin are independent).
+const collapsedKey = (role) => `ccp_sidebar_collapsed_${role}`
+
+function readCollapsed(role) {
+  try {
+    return localStorage.getItem(collapsedKey(role)) === '1'
+  } catch {
+    return false
+  }
+}
+
+// Shell for every signed-in page: the navy sidebar, a top bar and the content area.
+// Desktop (1024px and up): the menu button collapses the sidebar to an icon rail
+// or expands it again, and the content area follows the sidebar's width.
+// Tablets and phones: the sidebar is an off-canvas drawer opened by the same button.
 // Student and admin pages both use this; the menu items depend on the role.
 export default function DashboardLayout() {
   const { user, logout } = useAuth()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [collapsed, setCollapsed] = useState(() => readCollapsed(user.role))
+  const [isDesktop, setIsDesktop] = useState(() => window.matchMedia(DESKTOP_QUERY).matches)
   const mainRef = useRef(null)
   const menuButtonRef = useRef(null)
   const { pathname } = useLocation()
 
   const closeMenu = () => setMenuOpen(false)
 
-  // Pressing Escape collapses the menu and returns focus to the ☰ button.
+  // Track the breakpoint. Growing into desktop closes any open drawer.
+  useEffect(() => {
+    const query = window.matchMedia(DESKTOP_QUERY)
+    const handleChange = (event) => {
+      setIsDesktop(event.matches)
+      if (event.matches) setMenuOpen(false)
+    }
+    query.addEventListener('change', handleChange)
+    return () => query.removeEventListener('change', handleChange)
+  }, [])
+
+  const handleToggle = () => {
+    if (!isDesktop) {
+      setMenuOpen((isOpen) => !isOpen)
+      return
+    }
+    const next = !collapsed
+    setCollapsed(next)
+    try {
+      localStorage.setItem(collapsedKey(user.role), next ? '1' : '0')
+    } catch {
+      // Storage can be blocked; the sidebar still works for this visit.
+    }
+  }
+
+  const expanded = isDesktop ? !collapsed : menuOpen
+  const toggleLabel = isDesktop
+    ? collapsed
+      ? 'Expand sidebar'
+      : 'Collapse sidebar'
+    : menuOpen
+      ? 'Close menu'
+      : 'Open menu'
+
+  // Pressing Escape closes the drawer and returns focus to the menu button.
   useEffect(() => {
     if (!menuOpen) return undefined
     const handleKeyDown = (event) => {
@@ -42,7 +95,11 @@ export default function DashboardLayout() {
   }, [pathname])
 
   return (
-    <div className={`shell${menuOpen ? ' shell--menu-open' : ''}`}>
+    <div
+      className={`shell${menuOpen ? ' shell--menu-open' : ''}${
+        collapsed ? ' shell--collapsed' : ''
+      }`}
+    >
       <a className="skip-link" href="#main-content">
         Skip to main content
       </a>
@@ -52,13 +109,13 @@ export default function DashboardLayout() {
         items={NAV_BY_ROLE[user.role]}
         user={user}
         open={menuOpen}
-        onToggle={() => setMenuOpen((isOpen) => !isOpen)}
+        collapsed={isDesktop && collapsed}
+        onClose={closeMenu}
         onNavigate={closeMenu}
         onLogout={logout}
-        toggleRef={menuButtonRef}
       />
 
-      {/* Dims the page behind the expanded menu. Click it to collapse. */}
+      {/* Dims the page behind the open drawer. Click it to close. */}
       <div
         className={`shell__backdrop${menuOpen ? ' shell__backdrop--visible' : ''}`}
         onClick={closeMenu}
@@ -66,7 +123,32 @@ export default function DashboardLayout() {
       />
 
       <header className="shell__topbar">
-        <BrandMark inverse />
+        <button
+          type="button"
+          ref={menuButtonRef}
+          className="shell__menu-button"
+          aria-label={toggleLabel}
+          aria-expanded={expanded}
+          aria-controls={MENU_ID}
+          title={toggleLabel}
+          onClick={handleToggle}
+        >
+          <Menu className="icon" size={22} aria-hidden="true" />
+        </button>
+
+        <div className="shell__brand">
+          <BrandMark />
+        </div>
+
+        <div className="shell__user">
+          <div className="shell__user-text">
+            <span className="shell__user-name">{user.name}</span>
+            <span className="shell__user-role">{ROLE_LABELS[user.role]}</span>
+          </div>
+          <span className="avatar" aria-hidden="true">
+            {getInitials(user.name)}
+          </span>
+        </div>
       </header>
 
       <main className="shell__main" id="main-content" ref={mainRef} tabIndex={-1}>

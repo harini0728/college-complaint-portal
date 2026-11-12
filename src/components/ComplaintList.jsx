@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { ChevronRight } from 'lucide-react'
 import StatusBadge from './StatusBadge'
 import { formatDate } from '../utils/complaints'
 import './ComplaintList.css'
@@ -25,7 +26,10 @@ export default function ComplaintList({ complaints, getLink, showStudent = false
                 <span>{formatDate(complaint.submittedOn)}</span>
               </span>
             </div>
-            <StatusBadge status={complaint.status} />
+            <span className="complaint-item__end">
+              <StatusBadge status={complaint.status} />
+              <ChevronRight className="icon complaint-item__chevron" size={18} aria-hidden="true" />
+            </span>
           </Link>
         </li>
       ))}

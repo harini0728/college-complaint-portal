@@ -20,15 +20,15 @@
 .timeline__step:not(:last-child)::before {
   content: '';
   position: absolute;
-  top: var(--marker-size);
-  bottom: 0;
+  top: calc(var(--marker-size) + 0.25rem);
+  bottom: -0.1rem;
   left: calc(var(--marker-size) / 2 - 1px);
   width: 2px;
   background: var(--color-line);
 }
 
 .timeline__step--done:not(:last-child)::before {
-  background: var(--status-resolved-dot);
+  background: var(--blue-500);
 }
 
 .timeline__marker {
@@ -37,19 +37,19 @@
   height: var(--marker-size);
   margin-top: 0.15rem;
   background: var(--color-paper);
-  border: 2px solid var(--color-line-strong);
+  border: 2px solid var(--slate-300);
   border-radius: 50%;
 }
 
 .timeline__step--done .timeline__marker {
-  background: var(--status-resolved-dot);
-  border-color: var(--status-resolved-dot);
+  background: var(--blue-500);
+  border-color: var(--blue-500);
 }
 
 .timeline__step--current .timeline__marker {
   background: var(--color-primary);
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 4px var(--color-primary-soft);
+  box-shadow: 0 0 0 4px var(--blue-100);
 }
 
 .timeline__step--rejected.timeline__step--current .timeline__marker {
@@ -58,26 +58,32 @@
   box-shadow: 0 0 0 4px var(--status-rejected-bg);
 }
 
+.timeline__body {
+  min-width: 0;
+}
+
 .timeline__label {
+  font-size: var(--text-sm);
   font-weight: 600;
 }
 
 .timeline__step--upcoming .timeline__label,
 .timeline__step--upcoming .timeline__text {
-  color: var(--color-muted);
+  color: var(--slate-400);
 }
 
 .timeline__date,
 .timeline__text {
-  font-size: var(--text-sm);
+  font-size: var(--text-xs);
   color: var(--color-muted);
 }
 
 .timeline__response {
   margin-top: var(--space-2);
   padding: var(--space-2) var(--space-3);
-  background: var(--color-page);
-  border-left: 3px solid var(--color-line-strong);
+  background: var(--slate-50);
+  border: 1px solid var(--color-line);
+  border-left: 3px solid var(--color-primary);
   border-radius: var(--radius-sm);
   font-size: var(--text-sm);
   color: var(--color-ink);

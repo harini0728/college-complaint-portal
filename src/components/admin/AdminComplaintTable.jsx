@@ -31,10 +31,12 @@ export default function AdminComplaintTable({ complaints, from }) {
               <span className="admin-table__id">{complaint.id}</span>
             </th>
             <td data-label="Student">
-              {complaint.submittedBy.name}
-              <span className="admin-table__sub">
-                {complaint.submittedBy.email || complaint.submittedBy.id}
-              </span>
+              <div>
+                {complaint.submittedBy.name}
+                <span className="admin-table__sub">
+                  {complaint.submittedBy.email || complaint.submittedBy.id}
+                </span>
+              </div>
             </td>
             <td data-label="Category">{complaint.category}</td>
             <td data-label="Location">{complaint.location}</td>

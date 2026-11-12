@@ -245,3 +245,13 @@ export function getTimeline(complaint) {
   }
   return steps
 }
+// "Priya Sharma" -> "PS" (used for the round avatar in the sidebar and top bar)
+export function getInitials(name = '') {
+  const letters = name
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0].toUpperCase())
+  return letters.join('') || '?'
+}

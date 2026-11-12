@@ -1,4 +1,7 @@
 .login-help__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
   padding: var(--space-1) 0;
   font: inherit;
   font-size: var(--text-sm);
@@ -6,9 +9,11 @@
   color: var(--color-primary);
   background: none;
   border: 0;
-  text-decoration: underline;
-  text-underline-offset: 3px;
   cursor: pointer;
+}
+
+.login-help__toggle:hover {
+  color: var(--color-primary-hover);
 }
 
 .login-help__panel {
@@ -17,6 +22,7 @@
   margin-top: var(--space-3);
   padding: var(--space-4);
   font-size: var(--text-sm);
-  background: var(--color-primary-soft);
+  background: var(--blue-50);
+  border: 1px solid var(--blue-100);
   border-radius: var(--radius-sm);
 }

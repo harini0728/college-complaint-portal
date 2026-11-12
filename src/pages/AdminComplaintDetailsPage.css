@@ -14,11 +14,11 @@
 /* Wide screens: timeline sits beside the details. */
 @media (min-width: 1280px) {
   .admin-details {
-    grid-template-columns: minmax(0, 1fr) 20rem;
+    grid-template-columns: minmax(0, 1fr) 21rem;
   }
 
   .admin-details__aside {
     position: sticky;
-    top: var(--space-5);
+    top: calc(var(--topbar-height) + var(--space-5));
   }
 }

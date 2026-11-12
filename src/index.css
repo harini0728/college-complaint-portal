@@ -1,49 +1,76 @@
 /* ==========================================================================
    Global styles: design tokens + base reset.
-   Every colour, font size and spacing value used across the app lives here,
-   so changing the look of the whole portal means editing this one file.
+   Modern SaaS look: deep navy sidebar, royal blue accents, white cards on a
+   light slate page, Inter typography. Every colour, size and spacing value
+   used across the app lives here, so the whole look can be changed from this
+   one file.
    ========================================================================== */
 
 :root {
-  /* Colour */
-  --color-ink: #16222e;
-  --color-muted: #566370;
-  --color-page: #f3f5f6;
+  /* Brand */
+  --navy-950: #0f1b3d;
+  --navy-900: #172554;
+  --navy-800: #1e3a8a;
+  --navy-700: #1d3a8f;
+  --blue-700: #1d4ed8;
+  --blue-600: #2563eb;
+  --blue-500: #3b82f6;
+  --blue-100: #dbeafe;
+  --blue-50: #eff6ff;
+
+  /* Neutrals (slate) */
+  --slate-900: #0f172a;
+  --slate-700: #334155;
+  --slate-600: #475569;
+  --slate-500: #64748b;
+  --slate-400: #94a3b8;
+  --slate-300: #cbd5e1;
+  --slate-200: #e2e8f0;
+  --slate-100: #f1f5f9;
+  --slate-50: #f8fafc;
+
+  /* Semantic colour (names kept from the original theme so every component
+     keeps working) */
+  --color-ink: var(--slate-900);
+  --color-muted: var(--slate-500);
+  --color-page: var(--slate-50);
   --color-paper: #ffffff;
-  --color-line: #d9e0e5;
-  --color-line-strong: #a9b6bf;
-  --color-primary: #0e4a5c;
-  --color-primary-hover: #0a3947;
-  --color-primary-soft: #e3eff2;
+  --color-line: var(--slate-200);
+  --color-line-strong: var(--slate-300);
+  --color-primary: var(--blue-600);
+  --color-primary-hover: var(--blue-700);
+  --color-primary-soft: var(--blue-50);
   --color-on-primary: #ffffff;
-  --color-focus: #1b7f9a;
-  --color-danger: #b3261e;
-  --color-danger-soft: #fbeceb;
+  --color-focus: var(--blue-500);
+  --color-danger: #dc2626;
+  --color-danger-soft: #fef2f2;
+  --color-success: #16a34a;
+  --color-success-soft: #f0fdf4;
+  --color-sidebar: var(--navy-900);
 
   /* Complaint status colours (background / text / dot) */
-  --status-pending-bg: #fdf0d5;
-  --status-pending-fg: #7a4b00;
-  --status-pending-dot: #c47a00;
-  --status-in-progress-bg: #e0ecfa;
-  --status-in-progress-fg: #1b4b8a;
-  --status-in-progress-dot: #2f6fbf;
-  --status-resolved-bg: #dcf0e3;
-  --status-resolved-fg: #1c6237;
-  --status-resolved-dot: #2a8a4f;
-  --status-rejected-bg: #fbe0dd;
-  --status-rejected-fg: #9b2c25;
-  --status-rejected-dot: #c8433a;
+  --status-pending-bg: #fffbeb;
+  --status-pending-fg: #b45309;
+  --status-pending-dot: #f59e0b;
+  --status-in-progress-bg: #eff6ff;
+  --status-in-progress-fg: #1d4ed8;
+  --status-in-progress-dot: #2563eb;
+  --status-resolved-bg: #f0fdf4;
+  --status-resolved-fg: #15803d;
+  --status-resolved-dot: #22c55e;
+  --status-rejected-bg: #fef2f2;
+  --status-rejected-fg: #b91c1c;
+  --status-rejected-dot: #ef4444;
 
   /* Typography */
-  --font-body: 'Public Sans', system-ui, -apple-system, 'Segoe UI', Roboto,
-    sans-serif;
-  --font-heading: 'Source Serif 4', Georgia, 'Times New Roman', serif;
-  --text-xs: 0.8125rem;
+  --font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-heading: var(--font-body);
+  --text-xs: 0.75rem;
   --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.25rem;
-  --text-xl: 1.5625rem;
-  --text-2xl: 1.9375rem;
+  --text-base: 0.9375rem;
+  --text-lg: 1.0625rem;
+  --text-xl: 1.375rem;
+  --text-2xl: 1.75rem;
 
   /* Spacing and shape */
   --space-1: 0.25rem;
@@ -53,12 +80,20 @@
   --space-5: 1.5rem;
   --space-6: 2rem;
   --space-7: 3rem;
-  --radius-sm: 6px;
-  --radius-md: 10px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
 
-  /* Sidebar: slim icon rail when collapsed, sized to its labels when open. */
-  --rail-width: 4.5rem;
-  --sidebar-open-width: 13.5rem;
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --shadow-sm: 0 1px 3px rgba(15, 23, 42, 0.06), 0 1px 2px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 12px -2px rgba(15, 23, 42, 0.08), 0 2px 4px rgba(15, 23, 42, 0.04);
+  --shadow-lg: 0 20px 40px -12px rgba(15, 23, 42, 0.25);
+
+  /* Layout */
+  --sidebar-width: 16rem; /* expanded: 256px */
+  --sidebar-collapsed-width: 4.75rem; /* collapsed: 76px */
+  --topbar-height: 4rem;
 
   color-scheme: light;
   font-family: var(--font-body);
@@ -70,13 +105,6 @@
   text-rendering: optimizeLegibility;
 }
 
-/* A slightly slimmer icon rail on small screens. */
-@media (max-width: 899px) {
-  :root {
-    --rail-width: 4rem;
-  }
-}
-
 *,
 *::before,
 *::after {
@@ -85,6 +113,7 @@
 
 body {
   margin: 0;
+  font-size: var(--text-base);
 }
 
 #root {
@@ -97,7 +126,8 @@ h3 {
   margin: 0;
   font-family: var(--font-heading);
   font-weight: 600;
-  line-height: 1.2;
+  line-height: 1.25;
+  letter-spacing: -0.011em;
   color: var(--color-ink);
 }
 
@@ -107,11 +137,23 @@ p {
 
 a {
   color: var(--color-primary);
+  text-underline-offset: 2px;
+}
+
+a:hover {
+  color: var(--color-primary-hover);
+}
+
+/* Lucide icons: consistent stroke and alignment everywhere. */
+.icon {
+  flex: none;
+  display: inline-block;
+  vertical-align: middle;
 }
 
 /* Keyboard focus must always be visible. */
 :focus-visible {
-  outline: 3px solid var(--color-focus);
+  outline: 2px solid var(--color-focus);
   outline-offset: 2px;
 }
 
@@ -138,6 +180,7 @@ a {
   background: var(--color-paper);
   color: var(--color-primary);
   border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-md);
   transform: translateY(-200%);
 }
 
@@ -145,18 +188,22 @@ a {
   transform: translateY(0);
 }
 
-/* Grey placeholder shown while data is loading. */
+/* Shimmering placeholder shown while data is loading. */
 .skeleton {
   display: block;
   height: 1em;
-  background: var(--color-line);
-  border-radius: 4px;
-  animation: skeleton-pulse 1.2s ease-in-out infinite;
+  background: linear-gradient(90deg, var(--slate-100) 25%, var(--slate-200) 50%, var(--slate-100) 75%);
+  background-size: 200% 100%;
+  border-radius: 6px;
+  animation: skeleton-shimmer 1.4s ease-in-out infinite;
 }
 
-@keyframes skeleton-pulse {
-  50% {
-    opacity: 0.45;
+@keyframes skeleton-shimmer {
+  from {
+    background-position: 200% 0;
+  }
+  to {
+    background-position: -200% 0;
   }
 }
 

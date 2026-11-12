@@ -1,169 +1,212 @@
-/* Left rail. Collapsed: a slim column of icons (--rail-width). Open: it grows
-   just wide enough (--sidebar-open-width) to show the labels, the user and
-   Logout, and sits over the page (dimmed by the backdrop) until closed.
-   The page itself always keeps room for the collapsed rail, so the rail never
-   covers content. */
 .sidebar {
   position: fixed;
-  top: 0;
-  bottom: 0;
-  left: 0;
+  inset: 0 auto 0 0;
   z-index: 40;
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
-  width: var(--rail-width);
-  padding: 0 var(--space-2) var(--space-4);
-  overflow: hidden auto;
-  background: var(--color-primary);
-  color: var(--color-on-primary);
-  will-change: width;
-  transition: width 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s ease;
+  width: min(var(--sidebar-width), 86vw);
+  color: var(--slate-300);
+  background: linear-gradient(180deg, var(--navy-900) 0%, var(--navy-950) 100%);
+  transform: translateX(-100%);
+  visibility: hidden;
+  overflow-x: hidden;
+  transition: transform 0.25s ease, visibility 0s linear 0.25s;
 }
 
 .sidebar--open {
-  width: var(--sidebar-open-width);
-  box-shadow: 8px 0 24px rgba(22, 34, 46, 0.3);
+  transform: none;
+  visibility: visible;
+  box-shadow: var(--shadow-lg);
+  transition: transform 0.25s ease;
 }
 
-/* The default focus ring is teal on teal here, so use white. */
-.sidebar :focus-visible {
-  outline-color: #ffffff;
-}
-
-/* Top row: just the ☰ button, in the same spot open or closed. It is exactly as
-   tall as the top bar so the two line up. */
 .sidebar__head {
   display: flex;
   align-items: center;
-  min-height: 4rem;
+  justify-content: space-between;
+  gap: var(--space-3);
+  min-height: var(--topbar-height);
+  padding: 0 var(--space-4) 0 var(--space-5);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.sidebar__toggle {
+.sidebar__close {
+  display: grid;
+  place-items: center;
   flex: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 44px;
-  height: 44px;
-  /* Centres the button in the collapsed rail. */
-  margin-left: calc((var(--rail-width) - var(--space-4) - 44px) / 2);
-  padding: 0;
-  color: var(--color-on-primary);
-  background: none;
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  width: 2.25rem;
+  height: 2.25rem;
+  color: var(--slate-300);
+  background: transparent;
+  border: 0;
   border-radius: var(--radius-sm);
   cursor: pointer;
-  transition: background-color 0.15s ease;
 }
 
-.sidebar__toggle:hover,
-.sidebar--open .sidebar__toggle {
-  background: rgba(255, 255, 255, 0.16);
+.sidebar__close:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.08);
 }
 
-/* Labels and the user block are hidden while collapsed. They fade in / out
-   with the width change; nowrap keeps each label on one line so it is never
-   squeezed or wrapped mid-animation. */
-.sidebar__label,
+.sidebar__nav {
+  flex: 1;
+  padding: var(--space-5) var(--space-3) var(--space-4);
+  overflow-y: auto;
+}
+
+.sidebar__section {
+  margin: 0 var(--space-3) var(--space-2);
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--slate-400);
+}
+
+.sidebar__list {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.sidebar__link {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0 var(--space-3);
+  font: inherit;
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--slate-300);
+  text-align: left;
+  text-decoration: none;
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.sidebar__link:hover {
+  color: #fff;
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.sidebar__link.active {
+  color: #fff;
+  background: var(--color-primary);
+  box-shadow: 0 4px 12px -4px rgba(37, 99, 235, 0.7);
+}
+
+.sidebar__link:focus-visible {
+  outline-color: #fff;
+  outline-offset: -2px;
+}
+
+.sidebar__icon {
+  opacity: 0.9;
+}
+
+.sidebar__footer {
+  display: grid;
+  gap: var(--space-2);
+  padding: var(--space-4) var(--space-3);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
 .sidebar__user {
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.15s ease, visibility 0s linear 0.15s;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-2) var(--space-3);
+}
+
+.sidebar__user-text {
+  display: grid;
+  min-width: 0;
+}
+
+.sidebar__user-name {
+  overflow: hidden;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: #fff;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar__user-meta {
+  overflow: hidden;
+  font-size: var(--text-xs);
+  color: var(--slate-400);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar__logout:hover {
+  color: #fecaca;
+  background: rgba(239, 68, 68, 0.14);
 }
 
 .sidebar__label {
   white-space: nowrap;
 }
 
-.sidebar--open .sidebar__label,
-.sidebar--open .sidebar__user {
-  opacity: 1;
-  visibility: visible;
-  transition: opacity 0.2s ease 0.08s, visibility 0s;
-}
-
-.sidebar__nav {
+/* Let the brand shrink (and wrap) so it never runs under the close button. */
+.sidebar__head .brand {
   flex: 1;
+  min-width: 0;
 }
 
-.sidebar__list {
-  display: grid;
-  gap: var(--space-1);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-/* Links and the Logout button share this look. The side padding is worked out
-   from the rail width so the icons sit centred in the collapsed rail and stay
-   put (no jumping) while the sidebar opens. */
-.sidebar__link {
-  display: flex;
-  align-items: center;
-  gap: var(--space-3);
-  width: 100%;
-  min-height: 44px;
-  padding: 0 calc((var(--rail-width) - var(--space-4) - 22px) / 2);
-  font: inherit;
-  font-size: 0.9375rem;
-  color: #d3e6ec;
-  text-align: left;
-  text-decoration: none;
-  background: none;
-  border: 0;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-}
-
-.sidebar__icon {
-  flex: none;
-}
-
-.sidebar__link:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #ffffff;
-}
-
-.sidebar__link.active {
-  background: rgba(255, 255, 255, 0.16);
-  color: #ffffff;
-  font-weight: 600;
-  box-shadow: inset 3px 0 0 #ffffff;
-}
-
-.sidebar__footer {
-  display: grid;
-  gap: var(--space-3);
-  padding-top: var(--space-4);
-  border-top: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.sidebar__user {
-  display: grid;
-  padding: 0 var(--space-3);
-  overflow-wrap: anywhere;
-}
-
-.sidebar__user-name {
-  font-weight: 600;
-}
-
-.sidebar__user-meta {
-  font-size: var(--text-xs);
-  color: #cfe3e9;
-}
-
-@media (max-width: 899px) {
-  .sidebar__head {
-    min-height: 3.75rem;
+/* Desktop: the sidebar is always visible (expanded or collapsed to an icon rail)
+   and the drawer close button disappears. */
+@media (min-width: 1024px) {
+  .sidebar {
+    width: var(--sidebar-current);
+    transform: none;
+    visibility: visible;
+    box-shadow: none;
+    transition: width 0.25s ease;
   }
-}
 
-@media (prefers-reduced-motion: reduce) {
-  .sidebar,
-  .sidebar__label,
-  .sidebar__user {
-    transition: none;
+  .sidebar__close {
+    display: none;
+  }
+
+  /* Collapsed: icons only. Labels stay in the page for screen readers and the
+     links carry a title tooltip. */
+  .sidebar--collapsed .sidebar__head {
+    justify-content: center;
+    padding: 0;
+  }
+
+  .sidebar--collapsed .brand__name,
+  .sidebar--collapsed .sidebar__label,
+  .sidebar--collapsed .sidebar__user-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+  }
+
+  .sidebar--collapsed .sidebar__section {
+    display: none;
+  }
+
+  .sidebar--collapsed .sidebar__link {
+    justify-content: center;
+    padding: 0;
+  }
+
+  .sidebar--collapsed .sidebar__user {
+    justify-content: center;
+    padding: var(--space-2) 0;
   }
 }

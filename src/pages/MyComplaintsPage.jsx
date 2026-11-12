@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Plus, SearchX, FileX2 } from 'lucide-react'
 import PageHeader from '../components/PageHeader'
 import Panel from '../components/Panel'
 import EmptyState from '../components/EmptyState'
@@ -40,7 +41,12 @@ export default function MyComplaintsPage() {
       <PageHeader
         title="My complaints"
         description="Search your complaints and follow their progress."
-        action={<Button to={ROUTES.STUDENT_SUBMIT}>Submit a complaint</Button>}
+        action={
+          <Button to={ROUTES.STUDENT_SUBMIT}>
+            <Plus className="icon" size={16} aria-hidden="true" />
+            Submit a complaint
+          </Button>
+        }
       />
 
       <Panel title="All complaints">
@@ -86,6 +92,7 @@ export default function MyComplaintsPage() {
 
         {!loading && complaints.length === 0 && (
           <EmptyState
+            icon={FileX2}
             title="You have not submitted any complaints"
             message="When something on campus needs attention, report it here and follow its progress."
             action={<Button to={ROUTES.STUDENT_SUBMIT}>Submit a complaint</Button>}
@@ -94,6 +101,7 @@ export default function MyComplaintsPage() {
 
         {!loading && complaints.length > 0 && filtered.length === 0 && (
           <EmptyState
+            icon={SearchX}
             title="No complaints match your search"
             message="Try a different word, or choose another status."
             action={
