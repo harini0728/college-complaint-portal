@@ -24,9 +24,10 @@ function readCollapsed(role) {
 }
 
 // Shell for every signed-in page: the navy sidebar, a top bar and the content area.
-// Desktop (1024px and up): the menu button collapses the sidebar to an icon rail
-// or expands it again, and the content area follows the sidebar's width.
-// Tablets and phones: the sidebar is an off-canvas drawer opened by the same button.
+// Desktop (1024px and up): the sidebar can be hidden completely (button in the sidebar
+// header) and brought back with the menu button at the top-left. While hidden, the
+// content area uses the full width. The choice is remembered per role.
+// Tablets and phones: the sidebar is an off-canvas drawer with a backdrop.
 // Student and admin pages both use this; the menu items depend on the role.
 export default function DashboardLayout() {
   const { user, logout } = useAuth()
@@ -57,6 +58,11 @@ export default function DashboardLayout() {
     }
     const next = !collapsed
     setCollapsed(next)
+    // The sidebar's own button disappears with the sidebar, so hand focus to the
+    // menu button (and back again) to keep keyboard users oriented.
+    window.requestAnimationFrame(() => {
+      if (next) menuButtonRef.current?.focus()
+    })
     try {
       localStorage.setItem(collapsedKey(user.role), next ? '1' : '0')
     } catch {
@@ -65,13 +71,7 @@ export default function DashboardLayout() {
   }
 
   const expanded = isDesktop ? !collapsed : menuOpen
-  const toggleLabel = isDesktop
-    ? collapsed
-      ? 'Expand sidebar'
-      : 'Collapse sidebar'
-    : menuOpen
-      ? 'Close menu'
-      : 'Open menu'
+  const toggleLabel = expanded ? 'Close sidebar' : 'Open sidebar'
 
   // Pressing Escape closes the drawer and returns focus to the menu button.
   useEffect(() => {
@@ -110,7 +110,7 @@ export default function DashboardLayout() {
         user={user}
         open={menuOpen}
         collapsed={isDesktop && collapsed}
-        onClose={closeMenu}
+        onClose={handleToggle}
         onNavigate={closeMenu}
         onLogout={logout}
       />
@@ -130,7 +130,6 @@ export default function DashboardLayout() {
           aria-label={toggleLabel}
           aria-expanded={expanded}
           aria-controls={MENU_ID}
-          title={toggleLabel}
           onClick={handleToggle}
         >
           <Menu className="icon" size={22} aria-hidden="true" />

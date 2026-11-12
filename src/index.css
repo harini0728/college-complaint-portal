@@ -91,8 +91,7 @@
   --shadow-lg: 0 20px 40px -12px rgba(15, 23, 42, 0.25);
 
   /* Layout */
-  --sidebar-width: 16rem; /* expanded: 256px */
-  --sidebar-collapsed-width: 4.75rem; /* collapsed: 76px */
+  --sidebar-width: 16rem; /* 256px */
   --topbar-height: 4rem;
 
   color-scheme: light;

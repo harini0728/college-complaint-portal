@@ -1,5 +1,5 @@
 .shell {
-  /* Width of the sidebar on desktop; the sidebar and the content area both read it. */
+  /* Space the sidebar takes on desktop; the top bar and content read it. */
   --sidebar-current: var(--sidebar-width);
   min-height: 100svh;
   overflow-x: clip; /* never scroll sideways */
@@ -7,7 +7,7 @@
 }
 
 .shell--collapsed {
-  --sidebar-current: var(--sidebar-collapsed-width);
+  --sidebar-current: 0px; /* sidebar hidden: content uses the full width */
 }
 
 .shell__backdrop {
@@ -147,8 +147,14 @@
     transition: margin-left 0.25s ease;
   }
 
-  .shell__brand,
   .shell__backdrop {
+    display: none;
+  }
+
+  /* Sidebar showing: it has its own brand and close button, so the top bar
+     only needs them once the sidebar is hidden. */
+  .shell:not(.shell--collapsed) .shell__menu-button,
+  .shell:not(.shell--collapsed) .shell__brand {
     display: none;
   }
 

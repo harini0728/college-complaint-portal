@@ -8,7 +8,7 @@ import {
   Loader,
   LogOut,
   User,
-  X,
+  PanelLeftClose,
   XCircle,
   Inbox,
 } from 'lucide-react'
@@ -57,10 +57,10 @@ export default function Sidebar({
         <button
           type="button"
           className="sidebar__close"
-          aria-label="Close menu"
+          aria-label="Close sidebar"
           onClick={onClose}
         >
-          <X className="icon" size={20} aria-hidden="true" />
+          <PanelLeftClose className="icon" size={20} aria-hidden="true" />
         </button>
       </div>
 
@@ -71,12 +71,7 @@ export default function Sidebar({
             const ItemIcon = ICON_BY_ROUTE[item.to] ?? LayoutDashboard
             return (
               <li key={item.to}>
-                <NavLink
-                  to={item.to}
-                  className="sidebar__link"
-                  title={collapsed ? item.label : undefined}
-                  onClick={onNavigate}
-                >
+                <NavLink to={item.to} className="sidebar__link" onClick={onNavigate}>
                   <ItemIcon className="icon sidebar__icon" size={19} aria-hidden="true" />
                   <span className="sidebar__label">{item.label}</span>
                 </NavLink>
@@ -88,11 +83,7 @@ export default function Sidebar({
 
       <div className="sidebar__footer">
         <div className="sidebar__user">
-          <span
-            className="avatar avatar--on-dark"
-            title={collapsed ? `${user.name} (${ROLE_LABELS[user.role]})` : undefined}
-            aria-hidden="true"
-          >
+          <span className="avatar avatar--on-dark" aria-hidden="true">
             {getInitials(user.name)}
           </span>
           <div className="sidebar__user-text">
@@ -102,12 +93,7 @@ export default function Sidebar({
             </span>
           </div>
         </div>
-        <button
-          type="button"
-          className="sidebar__link sidebar__logout"
-          title={collapsed ? 'Logout' : undefined}
-          onClick={onLogout}
-        >
+        <button type="button" className="sidebar__link sidebar__logout" onClick={onLogout}>
           <LogOut className="icon sidebar__icon" size={19} aria-hidden="true" />
           <span className="sidebar__label">Logout</span>
         </button>
