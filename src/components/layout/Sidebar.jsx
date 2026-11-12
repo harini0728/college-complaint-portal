@@ -88,11 +88,7 @@ export default function Sidebar({
 
       <div className="sidebar__footer">
         <div className="sidebar__user">
-          <span
-            className="avatar avatar--on-dark"
-            title={collapsed ? `${user.name} (${ROLE_LABELS[user.role]})` : undefined}
-            aria-hidden="true"
-          >
+          <span className="avatar avatar--on-dark" aria-hidden="true">
             {getInitials(user.name)}
           </span>
           <div className="sidebar__user-text">
@@ -102,12 +98,7 @@ export default function Sidebar({
             </span>
           </div>
         </div>
-        <button
-          type="button"
-          className="sidebar__link sidebar__logout"
-          title={collapsed ? 'Logout' : undefined}
-          onClick={onLogout}
-        >
+        <button type="button" className="sidebar__link sidebar__logout" onClick={onLogout}>
           <LogOut className="icon sidebar__icon" size={19} aria-hidden="true" />
           <span className="sidebar__label">Logout</span>
         </button>

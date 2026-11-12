@@ -2,20 +2,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--space-5);
-  align-items: start;
-  width: 100%;
-}
-
-/* The header card always spans the full width. */
-.profile__hero {
-  grid-column: 1 / -1;
-}
-
-/* Desktop: account details beside the complaint summary. */
-@media (min-width: 1024px) {
-  .profile {
-    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-  }
+  max-width: 48rem;
 }
 
 .profile .panel-body {

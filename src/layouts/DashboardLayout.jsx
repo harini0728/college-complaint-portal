@@ -12,21 +12,8 @@ import './DashboardLayout.css'
 const MENU_ID = 'app-menu'
 const DESKTOP_QUERY = '(min-width: 1024px)'
 
-// Each role remembers its own sidebar choice (student and admin are independent).
-const collapsedKey = (role) => `ccp_sidebar_collapsed_${role}`
-
-function readCollapsed(role) {
-  try {
-    return localStorage.getItem(collapsedKey(role)) === '1'
-  } catch {
-    return false
-  }
-}
-
-// Shell for every signed-in page: the navy sidebar, a top bar and the content area.
-// Desktop (1024px and up): the menu button collapses the sidebar to an icon rail
-// or expands it again, and the content area follows the sidebar's width.
-// Tablets and phones: the sidebar is an off-canvas drawer opened by the same button.
+// Shell for every signed-in page: the navy sidebar (a drawer on tablets and
+// phones, opened with the menu button), a top bar and the content area.
 // Student and admin pages both use this; the menu items depend on the role.
 export default function DashboardLayout() {
   const { user, logout } = useAuth()
@@ -38,40 +25,6 @@ export default function DashboardLayout() {
   const { pathname } = useLocation()
 
   const closeMenu = () => setMenuOpen(false)
-
-  // Track the breakpoint. Growing into desktop closes any open drawer.
-  useEffect(() => {
-    const query = window.matchMedia(DESKTOP_QUERY)
-    const handleChange = (event) => {
-      setIsDesktop(event.matches)
-      if (event.matches) setMenuOpen(false)
-    }
-    query.addEventListener('change', handleChange)
-    return () => query.removeEventListener('change', handleChange)
-  }, [])
-
-  const handleToggle = () => {
-    if (!isDesktop) {
-      setMenuOpen((isOpen) => !isOpen)
-      return
-    }
-    const next = !collapsed
-    setCollapsed(next)
-    try {
-      localStorage.setItem(collapsedKey(user.role), next ? '1' : '0')
-    } catch {
-      // Storage can be blocked; the sidebar still works for this visit.
-    }
-  }
-
-  const expanded = isDesktop ? !collapsed : menuOpen
-  const toggleLabel = isDesktop
-    ? collapsed
-      ? 'Expand sidebar'
-      : 'Collapse sidebar'
-    : menuOpen
-      ? 'Close menu'
-      : 'Open menu'
 
   // Pressing Escape closes the drawer and returns focus to the menu button.
   useEffect(() => {
@@ -109,7 +62,6 @@ export default function DashboardLayout() {
         items={NAV_BY_ROLE[user.role]}
         user={user}
         open={menuOpen}
-        collapsed={isDesktop && collapsed}
         onClose={closeMenu}
         onNavigate={closeMenu}
         onLogout={logout}
@@ -127,11 +79,10 @@ export default function DashboardLayout() {
           type="button"
           ref={menuButtonRef}
           className="shell__menu-button"
-          aria-label={toggleLabel}
-          aria-expanded={expanded}
+          aria-label="Open menu"
+          aria-expanded={menuOpen}
           aria-controls={MENU_ID}
-          title={toggleLabel}
-          onClick={handleToggle}
+          onClick={() => setMenuOpen((isOpen) => !isOpen)}
         >
           <Menu className="icon" size={22} aria-hidden="true" />
         </button>
