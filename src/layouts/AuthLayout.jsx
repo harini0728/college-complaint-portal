@@ -1,4 +1,5 @@
 import BrandPanel from '../components/auth/BrandPanel'
+import ThemeToggle from '../components/ThemeToggle'
 import { COLLEGE } from '../constants/college'
 import './AuthLayout.css'
 
@@ -13,6 +14,9 @@ export default function AuthLayout({ children }) {
       <BrandPanel />
 
       <main className="auth-layout__main" id="main-content">
+        <div className="auth-layout__theme">
+          <ThemeToggle />
+        </div>
         <div className="auth-layout__content">{children}</div>
         <footer className="auth-layout__footer">
           &copy; {new Date().getFullYear()} {COLLEGE.portalName}

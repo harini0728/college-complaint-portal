@@ -27,7 +27,7 @@
   max-width: 26rem;
   margin-top: var(--space-3);
   font-size: var(--text-base);
-  color: var(--slate-300);
+  color: var(--on-navy-300);
 }
 
 .lifecycle {
@@ -45,7 +45,7 @@
   gap: var(--space-2);
   padding: var(--space-3) var(--space-4);
   font-size: var(--text-sm);
-  color: var(--slate-200);
+  color: var(--on-navy-200);
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: var(--radius-md);
@@ -57,7 +57,7 @@
   margin-top: var(--space-4);
   font-size: var(--text-sm);
   line-height: 1.9;
-  color: var(--slate-300);
+  color: var(--on-navy-300);
 }
 
 /* On the dark panel the status badges keep their light fill so they stay legible. */

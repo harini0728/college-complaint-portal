@@ -34,7 +34,7 @@
   min-height: 2.375rem;
   font-size: var(--text-sm);
   font-weight: 500;
-  color: var(--color-muted);
+  color: var(--slate-600);
   border-radius: 6px;
   transition: background-color 0.15s ease, color 0.15s ease;
 }
@@ -45,7 +45,7 @@
 
 .role-switch__option input:checked + .role-switch__label {
   background: var(--color-paper);
-  color: var(--color-primary);
+  color: var(--color-accent-text);
   font-weight: 600;
   box-shadow: var(--shadow-sm);
 }

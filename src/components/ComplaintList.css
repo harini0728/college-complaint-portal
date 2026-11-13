@@ -40,7 +40,7 @@ a.complaint-item:focus-visible {
 }
 
 a.complaint-item:hover .complaint-item__title {
-  color: var(--color-primary);
+  color: var(--color-accent-text);
 }
 
 .complaint-item__meta {

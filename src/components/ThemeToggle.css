@@ -1,0 +1,24 @@
+/* Compact rounded button with a subtle surface and border, matching the
+   sidebar button in the header. Navy Sun on light, white Moon on dark. */
+.theme-toggle {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 2.5rem;
+  height: 2.5rem;
+  color: var(--navy-900);
+  background: var(--color-paper);
+  border: 1px solid var(--color-line);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+:root[data-theme='dark'] .theme-toggle {
+  color: #ffffff;
+}
+
+.theme-toggle:hover {
+  background: var(--color-hover);
+  border-color: var(--color-line-hover);
+}

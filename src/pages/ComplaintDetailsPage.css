@@ -47,7 +47,7 @@
   font-size: var(--text-sm);
   color: var(--status-resolved-fg);
   background: var(--status-resolved-bg);
-  border: 1px solid #bbf7d0;
+  border: 1px solid var(--color-success-line);
   border-radius: var(--radius-md);
 }
 

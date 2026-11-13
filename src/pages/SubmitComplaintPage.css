@@ -22,7 +22,7 @@
   font-size: var(--text-sm);
   color: var(--status-rejected-fg);
   background: var(--color-danger-soft);
-  border: 1px solid #fecaca;
+  border: 1px solid var(--color-danger-line);
   border-radius: var(--radius-sm);
 }
 

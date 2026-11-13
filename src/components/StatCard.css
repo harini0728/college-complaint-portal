@@ -56,7 +56,7 @@
 }
 
 .stat-card__icon--total {
-  color: var(--blue-700);
+  color: var(--color-accent-text);
   background: var(--blue-50);
 }
 .stat-card__icon--pending {

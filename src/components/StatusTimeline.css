@@ -69,7 +69,7 @@
 
 .timeline__step--upcoming .timeline__label,
 .timeline__step--upcoming .timeline__text {
-  color: var(--slate-400);
+  color: var(--slate-500);
 }
 
 .timeline__date,

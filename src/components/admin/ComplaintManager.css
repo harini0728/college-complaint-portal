@@ -46,19 +46,19 @@
 .manager__feedback--success {
   color: var(--status-resolved-fg);
   background: var(--status-resolved-bg);
-  border-color: #bbf7d0;
+  border-color: var(--color-success-line);
 }
 
 .manager__feedback--error {
   color: var(--status-rejected-fg);
   background: var(--status-rejected-bg);
-  border-color: #fecaca;
+  border-color: var(--color-danger-line);
 }
 
 .manager__feedback--info {
   color: var(--status-in-progress-fg);
   background: var(--status-in-progress-bg);
-  border-color: #bfdbfe;
+  border-color: var(--color-info-line);
 }
 
 @media (max-width: 599px) {

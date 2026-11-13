@@ -21,7 +21,7 @@
 .status-badge--pending {
   color: var(--status-pending-fg);
   background: var(--status-pending-bg);
-  border-color: #fde68a;
+  border-color: var(--status-pending-line);
 }
 .status-badge--pending .status-badge__dot {
   background: var(--status-pending-dot);
@@ -30,7 +30,7 @@
 .status-badge--in-progress {
   color: var(--status-in-progress-fg);
   background: var(--status-in-progress-bg);
-  border-color: #bfdbfe;
+  border-color: var(--status-in-progress-line);
 }
 .status-badge--in-progress .status-badge__dot {
   background: var(--status-in-progress-dot);
@@ -39,7 +39,7 @@
 .status-badge--resolved {
   color: var(--status-resolved-fg);
   background: var(--status-resolved-bg);
-  border-color: #bbf7d0;
+  border-color: var(--status-resolved-line);
 }
 .status-badge--resolved .status-badge__dot {
   background: var(--status-resolved-dot);
@@ -48,7 +48,7 @@
 .status-badge--rejected {
   color: var(--status-rejected-fg);
   background: var(--status-rejected-bg);
-  border-color: #fecaca;
+  border-color: var(--status-rejected-line);
 }
 .status-badge--rejected .status-badge__dot {
   background: var(--status-rejected-dot);

@@ -12,6 +12,11 @@
   min-width: 0;
 }
 
+.auth-layout__theme {
+  display: flex;
+  justify-content: flex-end;
+}
+
 .auth-layout__content {
   display: flex;
   flex: 1;

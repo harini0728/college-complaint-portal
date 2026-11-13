@@ -58,7 +58,7 @@
 
 .profile__meta {
   font-size: var(--text-sm);
-  color: var(--slate-300);
+  color: var(--on-navy-300);
   overflow-wrap: anywhere;
 }
 

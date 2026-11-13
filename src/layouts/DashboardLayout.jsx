@@ -3,6 +3,7 @@ import { Link, Outlet, useLocation } from 'react-router-dom'
 import { Menu } from 'lucide-react'
 import Sidebar from '../components/layout/Sidebar'
 import BrandMark from '../components/BrandMark'
+import ThemeToggle from '../components/ThemeToggle'
 import { useAuth } from '../context/useAuth'
 import { NAV_BY_ROLE } from '../constants/navigation'
 import { ROLE_LABELS } from '../constants/roles'
@@ -140,19 +141,22 @@ export default function DashboardLayout() {
           <BrandMark />
         </div>
 
-        <Link
-          to={getProfilePath(user.role)}
-          className="shell__user"
-          aria-label={`${user.name}, open your profile`}
-        >
-          <div className="shell__user-text">
-            <span className="shell__user-name">{user.name}</span>
-            <span className="shell__user-role">{ROLE_LABELS[user.role]}</span>
-          </div>
-          <span className="avatar" aria-hidden="true">
-            {getInitials(user.name)}
-          </span>
-        </Link>
+        <div className="shell__actions">
+          <ThemeToggle />
+          <Link
+            to={getProfilePath(user.role)}
+            className="shell__user"
+            aria-label={`${user.name}, open your profile`}
+          >
+            <div className="shell__user-text">
+              <span className="shell__user-name">{user.name}</span>
+              <span className="shell__user-role">{ROLE_LABELS[user.role]}</span>
+            </div>
+            <span className="avatar" aria-hidden="true">
+              {getInitials(user.name)}
+            </span>
+          </Link>
+        </div>
       </header>
 
       <main className="shell__main" id="main-content" ref={mainRef} tabIndex={-1}>
