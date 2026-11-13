@@ -3,7 +3,7 @@ import { AuthContext } from './AuthContext'
 
 const STORAGE_KEY = 'ccp_user'
 const TOKEN_KEY = 'ccp_token'
-const API_URL = 'http://localhost:5000/api'
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api'
 
 // Read the saved user so a page refresh keeps you signed in.
 function loadStoredUser() {
