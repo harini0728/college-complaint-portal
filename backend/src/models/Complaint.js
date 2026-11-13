@@ -1,5 +1,6 @@
 import mongoose from 'mongoose'
 import { buildBaselineHistory, sortHistory } from '../utils/statusHistory.js'
+import { nextTicketNumber } from '../utils/ticketNumbers.js'
 
 const COMPLAINT_STATUSES = ['Pending', 'In Progress', 'Resolved', 'Rejected']
 
@@ -65,6 +66,16 @@ const complaintSchema = new mongoose.Schema(
       default: 'Pending',
     },
 
+    // Readable ticket number (#1001, #1002, ...), given when the complaint is
+    // saved for the first time. Complaints from before tickets existed get theirs
+    // when the server starts (see backfillTicketNumbers). `sparse` lets a record
+    // without a number sit beside the numbered ones until then.
+    ticketNumber: {
+      type: Number,
+      unique: true,
+      sparse: true,
+    },
+
     // Every status the complaint has had, oldest first. The first entry is
     // added automatically when the complaint is created.
     statusHistory: {
@@ -103,6 +114,14 @@ const complaintSchema = new mongoose.Schema(
 complaintSchema.pre('validate', async function () {
   if (this.isNew && this.statusHistory.length === 0) {
     this.statusHistory.push({ status: this.status, changedAt: new Date() })
+  }
+})
+
+// The ticket number is taken after the complaint has passed validation, so a
+// rejected form never uses one up.
+complaintSchema.pre('save', async function () {
+  if (this.isNew && this.ticketNumber == null) {
+    this.ticketNumber = await nextTicketNumber()
   }
 })
 

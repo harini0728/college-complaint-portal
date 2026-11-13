@@ -11,7 +11,7 @@ import { ComplaintListSkeleton } from '../components/ComplaintList'
 import ComplaintManager from '../components/admin/ComplaintManager'
 import { useAdminComplaint } from '../hooks/useAdminComplaint'
 import { ROUTES } from '../constants/routes'
-import { formatDate } from '../utils/complaints'
+import { formatDate, getTicketLabel } from '../utils/complaints'
 import './AdminComplaintDetailsPage.css'
 
 export default function AdminComplaintDetailsPage() {
@@ -72,7 +72,7 @@ export default function AdminComplaintDetailsPage() {
     <>
       <PageHeader
         title={complaint.title}
-        description={`${complaint.id} · Submitted by ${complaint.submittedBy.name} on ${formatDate(complaint.submittedOn)}`}
+        description={`${getTicketLabel(complaint)} · Submitted by ${complaint.submittedBy.name} on ${formatDate(complaint.submittedOn)}`}
         action={backButton}
       />
 

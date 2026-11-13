@@ -51,9 +51,22 @@ a.complaint-item:hover .complaint-item__title {
   color: var(--color-muted);
 }
 
+/* Ticket number, category and date sit on one line, separated by dots. Each stays
+   in one piece: when space runs out the whole item moves to the next line. */
+.complaint-item__meta > span {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+.complaint-item__meta > span + span::before {
+  margin-right: var(--space-3);
+  color: var(--color-line-hover);
+  content: '\00b7';
+}
+
 .complaint-item__id {
   font-weight: 600;
-  color: var(--slate-700);
+  color: var(--color-text-2);
 }
 
 .complaint-item__chevron {

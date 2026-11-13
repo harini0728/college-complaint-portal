@@ -143,7 +143,8 @@ export async function getComplaintById(req, res) {
 // GET /api/complaints  (admin only — enforced in the route)
 // Optional query params:
 //   status  Pending | In Progress | Resolved | Rejected
-//   search  text matched (case-insensitive) in title, description, category, location
+//   search  text matched (case-insensitive) in title, description, category, location;
+//           a number such as 1001 or #1001 also finds that ticket
 //   sort    newest (default) | oldest
 // With no params it returns every complaint, newest first.
 export async function getAllComplaints(req, res) {
@@ -163,6 +164,12 @@ export async function getAllComplaints(req, res) {
       { category: pattern },
       { location: pattern },
     ]
+
+    // "1001" or "#1001" finds that ticket.
+    const ticketSearch = search.replace(/^#/, '')
+    if (/^\d{1,9}$/.test(ticketSearch)) {
+      filter.$or.push({ ticketNumber: Number(ticketSearch) })
+    }
   }
 
   // _id is a tie-breaker so complaints created in the same millisecond keep a
@@ -201,7 +208,7 @@ export async function getComplaintSummary(_req, res) {
     // Only the fields a dashboard row needs. Same order as the admin list
     // (newest first, _id as the tie-breaker).
     Complaint.find()
-      .select('title category location status createdAt updatedAt submittedBy')
+      .select('ticketNumber title category location status createdAt updatedAt submittedBy')
       .populate('submittedBy', 'name email')
       .sort({ createdAt: -1, _id: -1 })
       .limit(DASHBOARD_RECENT_COUNT),

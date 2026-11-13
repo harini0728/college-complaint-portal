@@ -115,3 +115,8 @@
     text-align: left !important;
   }
 }
+
+/* A date such as "13 Nov 2026" stays on one line. */
+.admin-table td[data-label='Submitted'] {
+  white-space: nowrap;
+}

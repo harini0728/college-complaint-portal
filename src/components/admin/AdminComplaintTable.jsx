@@ -1,7 +1,7 @@
 import StatusBadge from '../StatusBadge'
 import Button from '../ui/Button'
 import { adminComplaintPath } from '../../constants/routes'
-import { formatDate } from '../../utils/complaints'
+import { formatDate, getTicketLabel } from '../../utils/complaints'
 import './AdminComplaintTable.css'
 
 // Table of complaints for the admin. On small screens every row turns into a card.
@@ -28,7 +28,7 @@ export default function AdminComplaintTable({ complaints, from }) {
           <tr key={complaint.id}>
             <th scope="row" className="admin-table__complaint">
               <span className="admin-table__title">{complaint.title}</span>
-              <span className="admin-table__id">{complaint.id}</span>
+              <span className="admin-table__id">{getTicketLabel(complaint)}</span>
             </th>
             <td data-label="Student">
               <div>
@@ -52,7 +52,7 @@ export default function AdminComplaintTable({ complaints, from }) {
                 className="btn--small"
               >
                 View{' '}
-                <span className="visually-hidden">complaint {complaint.id}</span>
+                <span className="visually-hidden">complaint {getTicketLabel(complaint)}</span>
               </Button>
             </td>
           </tr>

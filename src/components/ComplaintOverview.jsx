@@ -1,7 +1,7 @@
 import StatusBadge from './StatusBadge'
 import DetailList from './DetailList'
 import { STATUS_DESCRIPTIONS } from '../constants/statuses'
-import { formatDate, formatFileSize } from '../utils/complaints'
+import { formatDate, formatFileSize, getTicketLabel } from '../utils/complaints'
 import './ComplaintOverview.css'
 
 // The body of a complaint's details: status, facts, description and attachment.
@@ -46,7 +46,7 @@ export default function ComplaintOverview({
 
       <DetailList
         items={[
-          { label: 'Complaint ID', value: complaint.id },
+          { label: 'Ticket number', value: getTicketLabel(complaint) },
           { label: 'Category', value: complaint.category },
           { label: 'Location', value: complaint.location },
           { label: 'Submitted on', value: formatDate(complaint.submittedOn) },

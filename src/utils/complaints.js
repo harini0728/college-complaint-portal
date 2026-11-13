@@ -5,14 +5,28 @@ export function statusSlug(status) {
   return status.toLowerCase().replace(/\s+/g, '-')
 }
 
-// "2026-09-24" -> "24 Sep 2026"
-export function formatDate(isoDate) {
-  return new Date(isoDate).toLocaleDateString('en-IN', {
-    day: 'numeric',
-    month: 'short',
-    year: 'numeric',
-    timeZone: 'UTC',
-  })
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+// "2026-11-13" or "2026-11-13T09:30:00.000Z" -> "13 Nov 2026"
+// The month names are fixed here because browsers differ ("Sept" vs "Sep"). A date
+// with no time is read as-is; a full timestamp is shown as the viewer's own date.
+export function formatDate(value) {
+  if (!value) return ''
+  const date = new Date(value)
+  if (Number.isNaN(date.getTime())) return ''
+
+  const dateOnly = /^\d{4}-\d{2}-\d{2}$/.test(value)
+  const day = dateOnly ? date.getUTCDate() : date.getDate()
+  const month = dateOnly ? date.getUTCMonth() : date.getMonth()
+  const year = dateOnly ? date.getUTCFullYear() : date.getFullYear()
+  return `${day} ${MONTHS[month]} ${year}`
+}
+
+// The reference people see for a complaint: "#1001". Complaints that have no
+// ticket number yet fall back to their old reference, so nothing shows blank.
+// Links must keep using complaint.id (the database _id), never this label.
+export function getTicketLabel(complaint) {
+  return complaint.ticketNumber ? `#${complaint.ticketNumber}` : String(complaint.id)
 }
 
 // "2026-09-30T14:05:00.000Z" -> "30 Sep 2026, 7:35 pm" in the viewer's own time
@@ -62,7 +76,7 @@ export function todayISO() {
 // Next reference number: CMP-1045 if the highest so far is CMP-1044.
 export function generateComplaintId(complaints) {
   const highest = complaints.reduce((max, complaint) => {
-    const number = Number(complaint.id.replace('CMP-', ''))
+    const number = Number(String(complaint.id).replace('CMP-', ''))
     return Number.isFinite(number) && number > max ? number : max
   }, 1000)
   return `CMP-${highest + 1}`
@@ -79,7 +93,7 @@ export function formatFileSize(bytes) {
 //   query:  matched against id, title, category, location and description
 //   status: a status name, or '' for all statuses
 export function filterComplaints(complaints, { query = '', status = '' }) {
-  const words = query.trim().toLowerCase().split(/\s+/).filter(Boolean)
+  const words = query.replace(/#/g, '').trim().toLowerCase().split(/\s+/).filter(Boolean)
 
   return complaints.filter((complaint) => {
     if (status && complaint.status !== status) return false
@@ -87,6 +101,7 @@ export function filterComplaints(complaints, { query = '', status = '' }) {
 
     const haystack = [
       complaint.id,
+      complaint.ticketNumber ?? '',
       complaint.title,
       complaint.category,
       complaint.location,
@@ -102,7 +117,8 @@ export function filterComplaints(complaints, { query = '', status = '' }) {
 
 // Oldest or newest first. Same-day complaints are ordered by their number.
 export function sortComplaints(complaints, order = 'newest') {
-  const numberOf = (complaint) => Number(complaint.id.replace('CMP-', '')) || 0
+  const numberOf = (complaint) =>
+    complaint.ticketNumber || Number(String(complaint.id).replace('CMP-', '')) || 0
   const direction = order === 'oldest' ? 1 : -1
   return [...complaints].sort(
     (a, b) =>
@@ -123,6 +139,7 @@ export function filterAdminComplaints(complaints, { query = '', category = '', s
 
     const haystack = [
       complaint.id,
+      complaint.ticketNumber ?? '',
       complaint.title,
       complaint.submittedBy.name,
       complaint.submittedBy.id,

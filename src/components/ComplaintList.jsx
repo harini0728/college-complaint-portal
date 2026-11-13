@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
 import StatusBadge from './StatusBadge'
-import { formatDate } from '../utils/complaints'
+import { formatDate, getTicketLabel } from '../utils/complaints'
 import './ComplaintList.css'
 
 // A list of complaints, one row each. Each row is a link to that complaint.
@@ -16,7 +16,7 @@ export default function ComplaintList({ complaints, getLink, showStudent = false
             <div className="complaint-item__main">
               <span className="complaint-item__title">{complaint.title}</span>
               <span className="complaint-item__meta">
-                <span className="complaint-item__id">{complaint.id}</span>
+                <span className="complaint-item__id">{getTicketLabel(complaint)}</span>
                 {showStudent && (
                   <span>
                     {complaint.submittedBy.name} ({complaint.submittedBy.email || complaint.submittedBy.id})

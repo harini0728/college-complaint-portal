@@ -10,7 +10,7 @@ import Button from '../components/ui/Button'
 import { useStudentComplaint } from '../hooks/useStudentComplaint'
 import { COMPLAINT_STATUSES as STATUS } from '../constants/statuses'
 import { ROUTES } from '../constants/routes'
-import { formatDate } from '../utils/complaints'
+import { formatDate, getTicketLabel } from '../utils/complaints'
 import './ComplaintDetailsPage.css'
 
 const BACK_BUTTON = (
@@ -77,7 +77,7 @@ export default function ComplaintDetailsPage() {
     <>
       <PageHeader
         title={complaint.title}
-        description={`${complaint.id} · Submitted on ${formatDate(complaint.submittedOn)}`}
+        description={`${getTicketLabel(complaint)} · Submitted on ${formatDate(complaint.submittedOn)}`}
         action={BACK_BUTTON}
       />
 
@@ -86,7 +86,7 @@ export default function ComplaintDetailsPage() {
           <CheckCircle2 className="icon" size={18} aria-hidden="true" />
           <p>
             <strong>Your complaint has been submitted.</strong> Your reference number is{' '}
-            {complaint.id}. You can follow its progress on this page or in{' '}
+            {getTicketLabel(complaint)}. You can follow its progress on this page or in{' '}
             <Link to={ROUTES.STUDENT_COMPLAINTS}>My complaints</Link>.
           </p>
         </div>
