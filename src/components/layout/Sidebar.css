@@ -113,27 +113,31 @@
 }
 
 .sidebar__footer {
-  display: grid;
-  gap: var(--space-2);
-  padding: var(--space-4) var(--space-3);
+  position: relative; /* the account menu opens upward from here */
+  padding: var(--space-3);
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+/* The whole profile row is one button: avatar, name, role and a small chevron. */
 .sidebar__user {
   display: flex;
   align-items: center;
   gap: var(--space-3);
+  width: 100%;
   min-width: 0;
   padding: var(--space-2) var(--space-3);
+  font: inherit;
   color: inherit;
-  text-decoration: none;
+  text-align: left;
+  background: transparent;
+  border: 0;
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: background-color 0.15s ease;
 }
 
 .sidebar__user:hover,
-.sidebar__user.active {
+.sidebar__user[aria-expanded='true'] {
   background: rgba(255, 255, 255, 0.08);
 }
 
@@ -142,8 +146,23 @@
   outline-offset: -2px;
 }
 
+.sidebar__user-chevron {
+  flex: none;
+  color: var(--on-navy-400);
+  transition: transform 0.2s ease, color 0.15s ease;
+}
+
+.sidebar__user:hover .sidebar__user-chevron {
+  color: #fff;
+}
+
+.sidebar__user[aria-expanded='true'] .sidebar__user-chevron {
+  transform: rotate(180deg);
+}
+
 .sidebar__user-text {
   display: grid;
+  flex: 1;
   min-width: 0;
 }
 
@@ -164,9 +183,107 @@
   white-space: nowrap;
 }
 
-.sidebar__logout:hover {
-  color: #fecaca;
-  background: rgba(239, 68, 68, 0.14);
+/* Account menu: a themed card (white in light mode, slate in dark mode) that
+   opens above the profile row. */
+.account__menu {
+  position: absolute;
+  right: var(--space-3);
+  bottom: calc(100% - var(--space-1));
+  left: var(--space-3);
+  z-index: 5;
+  display: grid;
+  gap: 2px;
+  padding: var(--space-1);
+  color: var(--color-ink);
+  background: var(--color-paper);
+  border: 1px solid var(--color-line);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  animation: account-menu-in 0.14s ease-out;
+}
+
+@keyframes account-menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+.account__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  width: 100%;
+  min-width: 0;
+  padding: var(--space-2) var(--space-3);
+  font: 500 var(--text-sm) / 1.25 var(--font-body);
+  color: var(--color-text-2);
+  text-align: left;
+  text-decoration: none;
+  background: transparent;
+  border: 0;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.account__item:hover {
+  color: var(--color-ink);
+  background: var(--color-hover);
+}
+
+.account__item.active {
+  color: var(--color-accent-text);
+  background: var(--color-primary-soft);
+}
+
+.account__item:focus-visible {
+  outline-offset: -2px;
+}
+
+.account__item--danger,
+.account__item--danger:hover {
+  color: var(--color-danger);
+}
+
+.account__item--danger:hover {
+  background: var(--color-danger-soft);
+}
+
+.account__info {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-width: 0;
+  padding: var(--space-2) var(--space-3);
+  color: var(--color-muted);
+}
+
+.account__info-text {
+  display: grid;
+  flex: 1;
+  min-width: 0;
+}
+
+.account__info-label {
+  font-size: var(--text-xs);
+  color: var(--color-muted);
+}
+
+/* The ID can be long, so it is cut with an ellipsis (hover shows all of it). */
+.account__info-value {
+  overflow: hidden;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--color-ink);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account__separator {
+  height: 1px;
+  margin: var(--space-1) var(--space-2);
+  background: var(--color-line);
 }
 
 .sidebar__label {

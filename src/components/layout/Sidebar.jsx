@@ -1,10 +1,13 @@
+import { useEffect, useId, useRef, useState } from 'react'
 import { NavLink } from 'react-router-dom'
 import {
   CheckCircle2,
+  ChevronUp,
   Clock,
   FilePlus2,
   LayoutDashboard,
   ListChecks,
+  Hash,
   Loader,
   LogOut,
   User,
@@ -13,7 +16,7 @@ import {
   Inbox,
 } from 'lucide-react'
 import BrandMark from '../BrandMark'
-import { ROLE_LABELS } from '../../constants/roles'
+import { ROLES, ROLE_LABELS } from '../../constants/roles'
 import { ROUTES, getProfilePath } from '../../constants/routes'
 import { getInitials } from '../../utils/complaints'
 import './Sidebar.css'
@@ -47,6 +50,46 @@ export default function Sidebar({
   onNavigate,
   onLogout,
 }) {
+  // The profile row at the bottom opens a small account menu (profile, ID, logout).
+  const [accountOpen, setAccountOpen] = useState(false)
+  const footerRef = useRef(null)
+  const triggerRef = useRef(null)
+  const accountMenuId = useId()
+  const idLabel = user.role === ROLES.ADMIN ? 'Staff ID' : 'Student ID'
+
+  const closeAccount = () => setAccountOpen(false)
+
+  // Close the menu on Escape (focus goes back to the row) or on any press outside it.
+  // That includes the backdrop and the sidebar's own close button.
+  useEffect(() => {
+    if (!accountOpen) return undefined
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        setAccountOpen(false)
+        triggerRef.current?.focus()
+      }
+    }
+    const handlePointerDown = (event) => {
+      if (!footerRef.current?.contains(event.target)) setAccountOpen(false)
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    document.addEventListener('pointerdown', handlePointerDown)
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown)
+      document.removeEventListener('pointerdown', handlePointerDown)
+    }
+  }, [accountOpen])
+
+  const handleNavigate = () => {
+    closeAccount()
+    onNavigate?.()
+  }
+
+  // Tabbing out of the menu closes it.
+  const handleBlur = (event) => {
+    if (!footerRef.current?.contains(event.relatedTarget)) closeAccount()
+  }
+
   return (
     <aside
       id={id}
@@ -81,26 +124,63 @@ export default function Sidebar({
         </ul>
       </nav>
 
-      <div className="sidebar__footer">
-        <NavLink
-          to={getProfilePath(user.role)}
+      <div className="sidebar__footer" ref={footerRef} onBlur={handleBlur}>
+        {accountOpen && (
+          <div className="account__menu" id={accountMenuId}>
+            <NavLink
+              to={getProfilePath(user.role)}
+              className="account__item"
+              onClick={handleNavigate}
+            >
+              <User className="icon" size={18} aria-hidden="true" />
+              <span>My Profile</span>
+            </NavLink>
+
+            {user.id ? (
+              <div className="account__info">
+                <Hash className="icon" size={18} aria-hidden="true" />
+                <div className="account__info-text">
+                  <span className="account__info-label">{idLabel}</span>
+                  <span className="account__info-value" title={String(user.id)}>
+                    {user.id}
+                  </span>
+                </div>
+              </div>
+            ) : null}
+
+            <div className="account__separator" role="separator" />
+
+            <button
+              type="button"
+              className="account__item account__item--danger"
+              onClick={onLogout}
+            >
+              <LogOut className="icon" size={18} aria-hidden="true" />
+              <span>Logout</span>
+            </button>
+          </div>
+        )}
+
+        <button
+          type="button"
+          ref={triggerRef}
           className="sidebar__user"
-          aria-label={`${user.name}, open your profile`}
-          onClick={onNavigate}
+          aria-haspopup="true"
+          aria-expanded={accountOpen}
+          aria-controls={accountOpen ? accountMenuId : undefined}
+          aria-label={`${user.name}, ${ROLE_LABELS[user.role]}. Account menu`}
+          onClick={() => setAccountOpen((value) => !value)}
         >
           <span className="avatar avatar--on-dark" aria-hidden="true">
             {getInitials(user.name)}
           </span>
-          <div className="sidebar__user-text">
-            <span className="sidebar__user-name">{user.name}</span>
-            <span className="sidebar__user-meta">
-              {ROLE_LABELS[user.role]}, {user.id}
+          <span className="sidebar__user-text">
+            <span className="sidebar__user-name" title={user.name}>
+              {user.name}
             </span>
-          </div>
-        </NavLink>
-        <button type="button" className="sidebar__link sidebar__logout" onClick={onLogout}>
-          <LogOut className="icon sidebar__icon" size={19} aria-hidden="true" />
-          <span className="sidebar__label">Logout</span>
+            <span className="sidebar__user-meta">{ROLE_LABELS[user.role]}</span>
+          </span>
+          <ChevronUp className="icon sidebar__user-chevron" size={16} aria-hidden="true" />
         </button>
       </div>
     </aside>
